@@ -1,29 +1,36 @@
 import { Input, NextUIProvider } from "@nextui-org/react";
+import { IconEye, IconEyeClosed } from "@tabler/icons-react";
+import { useState } from "react";
+
+import { useStorage } from "@plasmohq/storage/hook";
+
+import { StorageKeys } from "~config/storage";
 
 import "./style.css";
 
-import { useAtom } from "jotai";
-
-import { settingAtom } from "~atoms/settingAtom";
-
 function IndexPopup() {
-  const [settings, setSettings] = useAtom(settingAtom);
+  const [apiKey, setApiKey] = useStorage(StorageKeys.API_KEY);
+  const [isApiKeyVisible, setIsApiKeyVisible] = useState(false);
 
   const handleValueChange = (value: string) => {
     if (!value) return;
-    setSettings({ ...settings, apiKey: value });
+    setApiKey(value);
   };
+
+  const handleApiKeyEyeClick = () => {
+    setIsApiKeyVisible((prev) => !prev);
+  };
+
+  const ApiKeyEyeIcon = (
+    <button className="focus:outline-none" type="button" onClick={handleApiKeyEyeClick}>
+      {isApiKeyVisible ? <IconEyeClosed size={20} /> : <IconEye size={20} />}
+    </button>
+  );
 
   return (
     <NextUIProvider>
-      <div className="w-[300px] rounded p-4">
-        <Input
-          isClearable
-          isRequired
-          type="apiKey"
-          label="ApiKey"
-          onValueChange={handleValueChange}
-        />
+      <div className="w-[450px] rounded p-4">
+        <Input isRequired label="ApiKey" value={apiKey} onValueChange={handleValueChange} endContent={ApiKeyEyeIcon} type={isApiKeyVisible ? "text" : "password"} />
       </div>
     </NextUIProvider>
   );

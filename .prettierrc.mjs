@@ -2,7 +2,7 @@
  * @type {import('prettier').Options}
  */
 export default {
-  printWidth: 180,
+  printWidth: 165,
   tabWidth: 2,
   useTabs: false,
   semi: true,
@@ -23,4 +23,4 @@ export default {
     "",
     "^[./]"
   ]
-}
+};

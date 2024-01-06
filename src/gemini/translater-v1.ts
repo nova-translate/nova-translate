@@ -37,7 +37,9 @@ export async function run() {
   ];
 
   const parts = [
-    { text: "You are a professional translater. Translate sentences into literal and free translations respectively. Shakespeare put his hometown on the map." },
+    {
+      text: "You are a professional translator. Translate sentences into literal and free translations respectively. Shakespeare put his hometown on the map."
+    },
     { text: "target sentence: To carry coal to Newcastle" },
     { text: "literal translation from English to Chinese: 把煤炭运到纽卡斯尔" },
     { text: "free translation from English to Chinese: 多此一举" },
