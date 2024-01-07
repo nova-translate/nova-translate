@@ -6,7 +6,7 @@ import { useStorage } from "@plasmohq/storage/hook";
 
 import { StorageKeys } from "~config/storage";
 
-import "./style.css";
+import "~style.css";
 
 function IndexPopup() {
   const [apiKey, setApiKey] = useStorage(StorageKeys.API_KEY);

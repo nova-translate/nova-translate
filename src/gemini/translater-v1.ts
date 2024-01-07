@@ -1,17 +1,13 @@
-// node --version # Should be >= 18
-// npm install @google/generative-ai
-
-const { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } = require("@google/generative-ai");
+import { GoogleGenerativeAI, HarmBlockThreshold, HarmCategory } from "@google/generative-ai";
 
 const MODEL_NAME = "gemini-pro";
-const API_KEY = "YOUR_API_KEY";
 
-export async function run() {
-  const genAI = new GoogleGenerativeAI(API_KEY);
+export async function translateByV1(options: { apiKey: string }) {
+  const genAI = new GoogleGenerativeAI(options.apiKey);
   const model = genAI.getGenerativeModel({ model: MODEL_NAME });
 
   const generationConfig = {
-    temperature: 0.9,
+    temperature: 0,
     topK: 1,
     topP: 1,
     maxOutputTokens: 2048
@@ -70,4 +66,5 @@ export async function run() {
 
   const response = result.response;
   console.log(response.text());
+  return response.text();
 }
