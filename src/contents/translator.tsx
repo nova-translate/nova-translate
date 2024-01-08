@@ -1,4 +1,4 @@
-import { Textarea } from "@nextui-org/react";
+import { Divider, Textarea } from "@nextui-org/react";
 import { IconZodiacGemini } from "@tabler/icons-react";
 import cssText from "data-text:~style.css";
 import { AnimatePresence, motion } from "framer-motion";
@@ -103,9 +103,7 @@ const Translator = () => {
             whileTap={{ scale: 1 }}
             onClick={handleEntryIconClick}
           >
-            <motion.div whileHover={{ rotate: 360 }}>
-              <IconZodiacGemini size={20} />
-            </motion.div>
+            <IconZodiacGemini size={20} />
           </motion.div>
         )}
       </AnimatePresence>
@@ -127,9 +125,10 @@ const Translator = () => {
               onValueChange={handleSourceTextChange}
               classNames={{ input: "resize-y min-h-[80px] text-xs" }}
             />
-            {freeTargetText}
-            <br />
-            {literalTargetText}
+
+            <div>{freeTargetText}</div>
+            <Divider />
+            <div>{literalTargetText}</div>
           </motion.div>
         )}
       </AnimatePresence>
