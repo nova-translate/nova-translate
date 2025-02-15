@@ -1,4 +1,9 @@
-export enum TranslationType {
-  LITERAL,
-  FREE
+export enum TextType {  
+  SingleWord,
+  LongText,
+}
+
+export enum Mode {
+  Translation,
+  Learning,
 }
