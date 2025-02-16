@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "motion/react";
 import Mousetrap from "mousetrap";
 import { sendToBackground } from "@plasmohq/messaging";
 import { Check, ChevronsUpDown, LoaderCircle } from "lucide-react";
-import { LanguageEnum, Languages, MAX_TRANSLATION_LENGTH, PLASMO_CONTAINER_Z_INDEX } from "@/config/common";
+import { LanguageEnum, Languages, MAX_TRANSLATION_LENGTH } from "@/config/common";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -73,7 +73,7 @@ const Entry = () => {
     });
   }, []);
 
-  // update entry panel position when scrolling
+  // update entry panel position when scrolling the page
   useEffect(() => {
     const handleScroll = debounce(() => {
       if (!showEntryPanel) return;
@@ -98,7 +98,7 @@ const Entry = () => {
     return () => document.removeEventListener("scroll", handleScroll);
   }, [showEntryPanel]);
 
-  // hide entry panel
+  // hide entry panel when click outside
   useEffect(() => {
     const handleMouseDown = (event: MouseEvent) => {
       // do not hide if click on the extension element
