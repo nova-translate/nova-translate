@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import cssText from "data-text:@/styles/globals.css";
 import { AnimatePresence, motion } from "motion/react";
 import Mousetrap from "mousetrap";
@@ -16,7 +16,15 @@ const Entry = () => {
   const [targetText, setTargetText] = useState("");
   const [translating, setTranslating] = useState(false);
   const [showEntryPanel, setShowEntryPanel] = useState(false);
-  const [entryPanelPosition, setEntryPanelPosition] = useState({ x: 0, y: 0 });
+  const [sourceTextRect, setSourceTextRect] = useState({ left: 0, right: 0, top: 0, bottom: 0 });
+
+  // bottom middle of the selected text
+  const entryPanelPosition = useMemo(() => {
+    return {
+      x: sourceTextRect.left + (sourceTextRect.right - sourceTextRect.left) / 2,
+      y: sourceTextRect.bottom + 10
+    };
+  }, [sourceTextRect.left, sourceTextRect.right, sourceTextRect.bottom]);
 
   const getTranslatedText = async (selectedText: string) => {
     setTranslating(true);
@@ -44,13 +52,14 @@ const Entry = () => {
         return;
       }
 
+      const selectedText = selection.toString().trim();
       const range = selection.getRangeAt(0);
       const rect = range.getBoundingClientRect();
-      const selectedText = selection.toString().trim();
+      const { left, right, top, bottom } = rect;
 
       setSourceText(selectedText);
       setShowEntryPanel(true);
-      setEntryPanelPosition({ x: rect.left + rect.width + 8, y: rect.bottom + 8 });
+      setSourceTextRect({ left, right, top, bottom });
       getTranslatedText(selectedText);
     });
   }, []);
@@ -60,7 +69,7 @@ const Entry = () => {
     const handleMouseClick = (event: MouseEvent) => {
       setSourceText("");
       setShowEntryPanel(false);
-      setEntryPanelPosition({ x: 0, y: 0 });
+      setSourceTextRect({ left: 0, right: 0, top: 0, bottom: 0 });
     };
 
     document.addEventListener("click", handleMouseClick);
@@ -72,7 +81,7 @@ const Entry = () => {
       <AnimatePresence>
         {showEntryPanel && (
           <motion.div className="fixed" initial={{ opacity: 0, x: entryPanelPosition.x, y: entryPanelPosition.y }} whileInView={{ opacity: 1 }}>
-            <div className="py-1 px-2 border border-gray-800 shadow rounded bg-white text-black">
+            <div className="max-w-md py-2 px-3 border border-gray-800 shadow rounded bg-white text-black -translate-x-1/2 text-sm">
               {translating ? <Loader2 className="animate-spin" /> : targetText}
             </div>
           </motion.div>
