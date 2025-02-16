@@ -3,7 +3,7 @@
   "displayName": "AI Translator",
   "version": "0.0.1",
   "description": "A translator tool based on AI LLM",
-  "author": "yhlchao@gmail.com",
+  "author": "lucas.liuchao@gmail.com",
   "scripts": {
     "dev": "plasmo dev",
     "build": "plasmo build",
