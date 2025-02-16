@@ -3,7 +3,7 @@ import cssText from "data-text:@/styles/globals.css";
 import { AnimatePresence, motion } from "motion/react";
 import Mousetrap from "mousetrap";
 import { sendToBackground } from "@plasmohq/messaging";
-import { Loader2 } from "lucide-react";
+import { LoaderCircle } from "lucide-react";
 import { MAX_TRANSLATION_LENGTH } from "@/config/common";
 
 export const getStyle = () => {
@@ -67,13 +67,13 @@ const Entry = () => {
 
   // hide entry panel
   useEffect(() => {
-    const handleMouseClick = (event: MouseEvent) => {
+    const handleMouseDown = (event: MouseEvent) => {
       setShowEntryPanel(false);
       setSourceTextRect({ left: 0, right: 0, top: 0, bottom: 0 });
     };
 
-    document.addEventListener("click", handleMouseClick);
-    return () => document.removeEventListener("click", handleMouseClick);
+    document.addEventListener("mousedown", handleMouseDown);
+    return () => document.removeEventListener("mousedown", handleMouseDown);
   }, []);
 
   return (
@@ -82,7 +82,7 @@ const Entry = () => {
         {showEntryPanel && (
           <motion.div className="fixed" initial={{ opacity: 0, x: entryPanelPosition.x, y: entryPanelPosition.y }} whileInView={{ opacity: 1 }}>
             <div className="max-w-md py-2 px-3 border border-gray-500 shadow-md rounded bg-white text-black -translate-x-1/2 text-sm">
-              {translating ? <Loader2 className="animate-spin" /> : targetText}
+              {translating ? <LoaderCircle className="animate-spin" /> : targetText}
             </div>
           </motion.div>
         )}
