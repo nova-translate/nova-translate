@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "motion/react";
 import Mousetrap from "mousetrap";
 import { sendToBackground } from "@plasmohq/messaging";
 import { Loader2 } from "lucide-react";
+import { MAX_TRANSLATION_LENGTH } from "@/config/common";
 
 export const getStyle = () => {
   const style = document.createElement("style");
@@ -12,7 +13,6 @@ export const getStyle = () => {
 };
 
 const Entry = () => {
-  const [sourceText, setSourceText] = useState("");
   const [targetText, setTargetText] = useState("");
   const [translating, setTranslating] = useState(false);
   const [showEntryPanel, setShowEntryPanel] = useState(false);
@@ -52,22 +52,22 @@ const Entry = () => {
         return;
       }
 
-      const selectedText = selection.toString().trim();
       const range = selection.getRangeAt(0);
       const rect = range.getBoundingClientRect();
       const { left, right, top, bottom } = rect;
 
-      setSourceText(selectedText);
+      const selectedText = selection.toString().trim();
+      const sourceText = selectedText.slice(0, MAX_TRANSLATION_LENGTH);
+
       setShowEntryPanel(true);
       setSourceTextRect({ left, right, top, bottom });
-      getTranslatedText(selectedText);
+      getTranslatedText(sourceText);
     });
   }, []);
 
   // hide entry panel
   useEffect(() => {
     const handleMouseClick = (event: MouseEvent) => {
-      setSourceText("");
       setShowEntryPanel(false);
       setSourceTextRect({ left: 0, right: 0, top: 0, bottom: 0 });
     };
@@ -81,7 +81,7 @@ const Entry = () => {
       <AnimatePresence>
         {showEntryPanel && (
           <motion.div className="fixed" initial={{ opacity: 0, x: entryPanelPosition.x, y: entryPanelPosition.y }} whileInView={{ opacity: 1 }}>
-            <div className="max-w-md py-2 px-3 border border-gray-800 shadow rounded bg-white text-black -translate-x-1/2 text-sm">
+            <div className="max-w-md py-2 px-3 border border-gray-500 shadow-md rounded bg-white text-black -translate-x-1/2 text-sm">
               {translating ? <Loader2 className="animate-spin" /> : targetText}
             </div>
           </motion.div>
