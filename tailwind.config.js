@@ -4,7 +4,7 @@
 module.exports = {
   mode: "jit",
   darkMode: "media",
-  content: ["./**/*.tsx", "components/**/*.{ts,tsx}"],
+  content: ["./src/**/*.tsx",],
   plugins: [require("tailwindcss-animate")],
   theme: {
     extend: {

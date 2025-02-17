@@ -11,6 +11,8 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { cn } from "@/lib/utils";
 import { debounce } from "lodash-es";
 import cssText from "data-text:@/styles/globals.css";
+import { useStorage } from "@plasmohq/storage/hook";
+import { StorageKeys } from "@/config/storage";
 
 export const getStyle = () => {
   const style = document.createElement("style");
@@ -19,11 +21,14 @@ export const getStyle = () => {
 };
 
 const Entry = () => {
-  const [targetLanguage, setTargetLanguage] = useState(LanguageEnum.Chinese);
   const [targetText, setTargetText] = useState("");
   const [translating, setTranslating] = useState(false);
   const [showEntryPanel, setShowEntryPanel] = useState(false);
   const [sourceTextRect, setSourceTextRect] = useState({ left: 0, right: 0, top: 0, bottom: 0 });
+  const [targetLanguage, setTargetLanguage] = useStorage(StorageKeys.TARGET_LANGUAGE, (value) => {
+    if (value === undefined) return LanguageEnum.English;
+    return value;
+  });
 
   // bottom middle of the selected text
   const entryPanelPosition = useMemo(() => {
