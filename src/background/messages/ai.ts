@@ -30,7 +30,7 @@ const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
 
   const result = await generateText({
     model: openAIProvider(modelId),
-    prompt: `你是一个翻译专家，你的目标是把任何语言翻译成[${targetLanguage}]，请翻译时不要带翻译腔，而是要翻译得自然、流畅和地道，保持最大程度的字面准确性，保留专业术语的原始形态。请翻译下面这句话：${sourceText}`
+    prompt: `你是一个翻译专家，你的目标是把任何语言翻译成[${targetLanguage}]，要求是翻译得自然、流畅和地道，同时保持最大程度的字面准确性，保留专业术语的原始形态，不要对翻译进行解释。请翻译下面这句话：${sourceText}`
   });
 
   const { text } = result;

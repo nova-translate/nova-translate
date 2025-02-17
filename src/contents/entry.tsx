@@ -10,9 +10,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
 import { debounce } from "lodash-es";
-import cssText from "data-text:@/styles/globals.css";
 import { useStorage } from "@plasmohq/storage/hook";
 import { StorageKeys } from "@/config/storage";
+
+import cssText from "data-text:@/styles/globals.css";
 
 export const getStyle = () => {
   const style = document.createElement("style");
@@ -21,6 +22,7 @@ export const getStyle = () => {
 };
 
 const Entry = () => {
+  const [sourceText, setSourceText] = useState("");
   const [targetText, setTargetText] = useState("");
   const [translating, setTranslating] = useState(false);
   const [showEntryPanel, setShowEntryPanel] = useState(false);
@@ -41,10 +43,12 @@ const Entry = () => {
   const getTranslatedText = async (selectedText: string) => {
     setTranslating(true);
 
+    console.log("selectedText", selectedText);
+
     const response = await sendToBackground({
       name: "ai",
       body: {
-        text: selectedText
+        text: selectedText || sourceText
       }
     });
 
@@ -52,11 +56,18 @@ const Entry = () => {
     setTargetText(response.text);
   };
 
+  const handleTargetLanguageChange = (language: LanguageEnum) => {
+    setTargetLanguage(language);
+    getTranslatedText(sourceText);
+  };
+
   // get text from selection and show entry panel
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     Mousetrap.bind("option+n", () => {
       const selection = window.getSelection();
+      if (!selection) return;
+
       const { isCollapsed } = selection;
 
       // no text selected
@@ -69,12 +80,13 @@ const Entry = () => {
       const rect = range.getBoundingClientRect();
       const { left, right, top, bottom } = rect;
 
-      const selectedText = selection.toString().trim();
-      const sourceText = selectedText.slice(0, MAX_TRANSLATION_LENGTH);
+      let selectedText = selection.toString().trim();
+      selectedText = selectedText.slice(0, MAX_TRANSLATION_LENGTH);
 
       setShowEntryPanel(true);
       setSourceTextRect({ left, right, top, bottom });
-      getTranslatedText(sourceText);
+      setSourceText(selectedText);
+      getTranslatedText(selectedText);
     });
   }, []);
 
@@ -84,13 +96,12 @@ const Entry = () => {
       if (!showEntryPanel) return;
 
       const selection = window.getSelection();
+      if (!selection) return;
+
       const { isCollapsed } = selection;
 
       // no text selected
-      if (isCollapsed) {
-        setShowEntryPanel(false);
-        return;
-      }
+      if (isCollapsed) return;
 
       const range = selection.getRangeAt(0);
       const rect = range.getBoundingClientRect();
@@ -129,13 +140,15 @@ const Entry = () => {
             exit={{ opacity: 0 }}
           >
             <div id="entry-panel-container" className="min-w-80 max-w-md py-2 px-3 border border-gray-500 shadow-lg rounded-md -translate-x-1/2 text-sm">
-              <div>{translating ? <LoaderCircle className="animate-spin" /> : targetText}</div>
-              <Separator className="my-2" />
+              <div className="text-sm">{translating ? <LoaderCircle className="animate-spin" size={20} /> : targetText}</div>
+              <Separator className="mt-3 mb-1.5" />
               <div className="flex justify-end">
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" className={cn("w-32 justify-between", !targetLanguage && "text-muted-foreground")}>
-                      {targetLanguage ? Languages.find((language) => language.value === targetLanguage)?.label : "Select language"}
+                    <Button variant="outline" size={"sm"} className={cn("justify-between", !targetLanguage && "text-muted-foreground")}>
+                      <div className="w-16 overflow-hidden overflow-ellipsis text-left">
+                        {targetLanguage ? Languages.find((language) => language.value === targetLanguage)?.label : "Select language"}
+                      </div>
                       <ChevronsUpDown className="opacity-50" />
                     </Button>
                   </PopoverTrigger>
@@ -146,7 +159,7 @@ const Entry = () => {
                         <CommandEmpty>No language found.</CommandEmpty>
                         <CommandGroup>
                           {Languages.map((language) => (
-                            <CommandItem value={language.label} key={language.value} onSelect={() => setTargetLanguage(language.value)}>
+                            <CommandItem value={language.label} key={language.value} onSelect={() => handleTargetLanguageChange(language.value)}>
                               {language.label}
                               <Check className={cn("ml-auto", language.value === targetLanguage ? "opacity-100" : "opacity-0")} />
                             </CommandItem>
