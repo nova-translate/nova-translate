@@ -139,8 +139,8 @@ const Entry = () => {
             animate={{ opacity: 1, x: entryPanelPosition.x, y: entryPanelPosition.y }}
             exit={{ opacity: 0 }}
           >
-            <div id="entry-panel-container" className="min-w-80 max-w-md py-2 px-3 border border-gray-500 shadow-lg rounded-md -translate-x-1/2 text-sm">
-              <div className="text-sm">{translating ? <LoaderCircle className="animate-spin" size={20} /> : targetText}</div>
+            <div id="entry-panel-container" className="min-w-80 max-w-md py-2 px-3 border border-gray-500 shadow-lg rounded-md fixed -translate-x-1/2 text-sm">
+              <div className="min-h-6">{translating ? <LoaderCircle className="animate-spin" size={20} /> : targetText}</div>
               <Separator className="mt-3 mb-1.5" />
               <div className="flex justify-end">
                 <Popover>
@@ -152,7 +152,7 @@ const Entry = () => {
                       <ChevronsUpDown className="opacity-50" />
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-32 p-0">
+                  <PopoverContent className="w-28 p-0">
                     <Command>
                       <CommandInput placeholder="Search" className="h-9" />
                       <CommandList>
