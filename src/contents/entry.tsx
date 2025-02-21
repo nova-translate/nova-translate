@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import Mousetrap from "mousetrap";
-import { sendToBackground } from "@plasmohq/messaging";
+import { usePort } from "@plasmohq/messaging/hook";
 import { ArrowRight, Check, ChevronsUpDown, LoaderCircle } from "lucide-react";
 import { LanguageEnum, Languages, MAX_TRANSLATION_LENGTH } from "@/config/common";
 import { Button } from "@/components/ui/button";
@@ -9,11 +9,12 @@ import { Separator } from "@/components/ui/separator";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
-import { debounce } from "lodash-es";
+import { debounce, uniqueId } from "lodash-es";
 import { useStorage } from "@plasmohq/storage/hook";
 import { StorageKeys } from "@/config/storage";
 
 import cssText from "data-text:@/styles/globals.css";
+import { MessageTypes } from "@/config/message";
 
 export const getStyle = () => {
   const style = document.createElement("style");
@@ -22,7 +23,9 @@ export const getStyle = () => {
 };
 
 const Entry = () => {
+  const aiPort = usePort("ai");
   const [sourceText, setSourceText] = useState("");
+  const [textId, setTextId] = useState("");
   const [targetText, setTargetText] = useState("");
   const [translating, setTranslating] = useState(false);
   const [showEntryPanel, setShowEntryPanel] = useState(false);
@@ -41,25 +44,46 @@ const Entry = () => {
   }, [sourceTextRect.left, sourceTextRect.right, sourceTextRect.bottom]);
 
   const getTranslatedText = async (selectedText: string) => {
-    setTranslating(true);
+    const id = uniqueId();
+    setTextId(id);
+    setTargetText("");
+    setSourceText(selectedText);
 
-    console.log("selectedText", selectedText);
-
-    const response = await sendToBackground({
-      name: "ai",
-      body: {
-        text: selectedText || sourceText
-      }
+    aiPort.send({
+      uniqueId: id,
+      text: selectedText || sourceText
     });
-
-    setTranslating(false);
-    setTargetText(response.text);
   };
 
   const handleTargetLanguageChange = (language: LanguageEnum) => {
     setTargetLanguage(language);
     getTranslatedText(sourceText);
   };
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  useEffect(() => {
+    const listener = aiPort.listen((message) => {
+      const { messageType, data } = message;
+
+      if (messageType === MessageTypes.TRANSLATE_TEXT_PART) {
+        const { uniqueId, text } = data;
+        if (uniqueId !== textId) return;
+
+        setTargetText((prev) => {
+          return prev + text;
+        });
+      }
+
+      if (messageType === MessageTypes.TRANSLATE_TEXT_ERROR) {
+        const { uniqueId, error } = data;
+        if (uniqueId !== textId) return;
+
+        setTargetText(error.message);
+      }
+    });
+
+    return () => listener.disconnect();
+  }, [textId]);
 
   // get text from selection and show entry panel
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
@@ -85,7 +109,6 @@ const Entry = () => {
 
       setShowEntryPanel(true);
       setSourceTextRect({ left, right, top, bottom });
-      setSourceText(selectedText);
       getTranslatedText(selectedText);
     });
   }, []);
@@ -134,45 +157,44 @@ const Entry = () => {
       <AnimatePresence>
         {showEntryPanel && (
           <motion.div
-            className="fixed"
+            id="entry-panel-container"
+            className="w-96 py-2 px-3 border border-gray-200 shadow-lg rounded-md fixed -translate-x-1/2 text-sm"
             initial={{ opacity: 0, x: entryPanelPosition.x, y: entryPanelPosition.y }}
             animate={{ opacity: 1, x: entryPanelPosition.x, y: entryPanelPosition.y }}
             exit={{ opacity: 0 }}
           >
-            <div id="entry-panel-container" className="w-96 py-2 px-3 border border-gray-500 shadow-lg rounded-md fixed -translate-x-1/2 text-sm">
-              <div className="min-h-6">{translating ? <LoaderCircle className="animate-spin" size={20} /> : targetText}</div>
-              <Separator className="mt-3 mb-1.5" />
-              <div className="flex items-center">
-                <Button disabled variant="outline" size={"sm"} className={cn("justify-between", !targetLanguage && "text-muted-foreground")}>
-                  <div className="w-24 overflow-hidden overflow-ellipsis text-left">Any Language</div>
-                  <ChevronsUpDown className="opacity-50" />
-                </Button>
-                <ArrowRight size={20} className="mx-2" />
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" size={"sm"} className={cn("justify-between", !targetLanguage && "text-muted-foreground")}>
-                      <div className="overflow-hidden overflow-ellipsis text-left">{Languages.find((language) => language.value === targetLanguage)?.label}</div>
-                      <ChevronsUpDown className="opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-28 p-0">
-                    <Command>
-                      <CommandInput placeholder="Search" className="h-9" />
-                      <CommandList>
-                        <CommandEmpty>No language found.</CommandEmpty>
-                        <CommandGroup>
-                          {Languages.map((language) => (
-                            <CommandItem value={language.label} key={language.value} onSelect={() => handleTargetLanguageChange(language.value)}>
-                              {language.label}
-                              <Check className={cn("ml-auto", language.value === targetLanguage ? "opacity-100" : "opacity-0")} />
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-              </div>
+            <div className="min-h-6 text-sm">{targetText}</div>
+            <Separator className="mt-3 mb-1.5" />
+            <div className="flex items-center">
+              <Button disabled variant="outline" size={"sm"} className={cn("justify-between", !targetLanguage && "text-muted-foreground")}>
+                <div className="w-24 overflow-hidden overflow-ellipsis text-left">Any Language</div>
+                <ChevronsUpDown className="opacity-50" />
+              </Button>
+              <ArrowRight size={20} className="mx-2" />
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size={"sm"} className={cn("backdrop-blur-2xl justify-between", !targetLanguage && "text-muted-foreground")}>
+                    <div className="overflow-hidden overflow-ellipsis text-left">{Languages.find((language) => language.value === targetLanguage)?.label}</div>
+                    <ChevronsUpDown className="opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-28 p-0 bg-transparent backdrop-blur-2xl">
+                  <Command>
+                    <CommandInput placeholder="Search" className="h-9" />
+                    <CommandList>
+                      <CommandEmpty>No language found.</CommandEmpty>
+                      <CommandGroup>
+                        {Languages.map((language) => (
+                          <CommandItem value={language.label} key={language.value} onSelect={() => handleTargetLanguageChange(language.value)}>
+                            {language.label}
+                            <Check className={cn("ml-auto", language.value === targetLanguage ? "opacity-100" : "opacity-0")} />
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
           </motion.div>
         )}

@@ -51,6 +51,6 @@
 
 @layer base {
   #entry-panel-container {
-    @apply font-sans antialiased bg-background text-foreground text-base;
+    @apply font-sans antialiased backdrop-blur-xl text-foreground text-base;
   }
 }
