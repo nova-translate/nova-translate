@@ -32,9 +32,6 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
   const result = streamText({
     model: openAIProvider(modelId),
     prompt: `你是一个翻译专家，你的目标是把任何语言翻译成[${targetLanguage}]，要求是翻译得自然、流畅和地道，同时保持最大程度的字面准确性，保留专业术语的原始形态，不要对翻译进行解释。请翻译下面这句话：${sourceText}`,
-    onChunk({ chunk }) {
-      console.log("chunk", chunk);
-    },
     onFinish({ text, finishReason, usage, response }) {
       res.send({
         messageType: MessageTypes.TRANSLATE_TEXT_FINISH,
@@ -50,8 +47,6 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
   });
 
   for await (const textPart of result.textStream) {
-    console.log("textPart", textPart);
-
     res.send({
       messageType: MessageTypes.TRANSLATE_TEXT_PART,
       data: { uniqueId, text: textPart }

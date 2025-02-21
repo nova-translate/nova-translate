@@ -27,7 +27,6 @@ const Entry = () => {
   const [sourceText, setSourceText] = useState("");
   const [textId, setTextId] = useState("");
   const [targetText, setTargetText] = useState("");
-  const [translating, setTranslating] = useState(false);
   const [showEntryPanel, setShowEntryPanel] = useState(false);
   const [sourceTextRect, setSourceTextRect] = useState({ left: 0, right: 0, top: 0, bottom: 0 });
   const [targetLanguage, setTargetLanguage] = useStorage(StorageKeys.TARGET_LANGUAGE, (value) => {
@@ -158,12 +157,12 @@ const Entry = () => {
         {showEntryPanel && (
           <motion.div
             id="entry-panel-container"
-            className="w-96 py-2 px-3 border border-gray-200 shadow-lg rounded-md fixed -translate-x-1/2 text-sm"
+            className="fixed w-96 py-2 px-3 border border-gray-200 shadow-lg rounded-md -translate-x-1/2"
             initial={{ opacity: 0, x: entryPanelPosition.x, y: entryPanelPosition.y }}
             animate={{ opacity: 1, x: entryPanelPosition.x, y: entryPanelPosition.y }}
             exit={{ opacity: 0 }}
           >
-            <div className="min-h-6 text-sm">{targetText}</div>
+            <div className="min-h-6">{targetText}</div>
             <Separator className="mt-3 mb-1.5" />
             <div className="flex items-center">
               <Button disabled variant="outline" size={"sm"} className={cn("justify-between", !targetLanguage && "text-muted-foreground")}>
