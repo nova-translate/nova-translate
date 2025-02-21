@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import Mousetrap from "mousetrap";
 import { sendToBackground } from "@plasmohq/messaging";
-import { Check, ChevronsUpDown, LoaderCircle } from "lucide-react";
+import { ArrowRight, Check, ChevronsUpDown, LoaderCircle } from "lucide-react";
 import { LanguageEnum, Languages, MAX_TRANSLATION_LENGTH } from "@/config/common";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -139,16 +139,19 @@ const Entry = () => {
             animate={{ opacity: 1, x: entryPanelPosition.x, y: entryPanelPosition.y }}
             exit={{ opacity: 0 }}
           >
-            <div id="entry-panel-container" className="min-w-80 max-w-md py-2 px-3 border border-gray-500 shadow-lg rounded-md fixed -translate-x-1/2 text-sm">
+            <div id="entry-panel-container" className="w-96 py-2 px-3 border border-gray-500 shadow-lg rounded-md fixed -translate-x-1/2 text-sm">
               <div className="min-h-6">{translating ? <LoaderCircle className="animate-spin" size={20} /> : targetText}</div>
               <Separator className="mt-3 mb-1.5" />
-              <div className="flex justify-end">
+              <div className="flex items-center">
+                <Button disabled variant="outline" size={"sm"} className={cn("justify-between", !targetLanguage && "text-muted-foreground")}>
+                  <div className="w-24 overflow-hidden overflow-ellipsis text-left">Any Language</div>
+                  <ChevronsUpDown className="opacity-50" />
+                </Button>
+                <ArrowRight size={20} className="mx-2" />
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button variant="outline" size={"sm"} className={cn("justify-between", !targetLanguage && "text-muted-foreground")}>
-                      <div className="w-16 overflow-hidden overflow-ellipsis text-left">
-                        {targetLanguage ? Languages.find((language) => language.value === targetLanguage)?.label : "Select language"}
-                      </div>
+                      <div className="overflow-hidden overflow-ellipsis text-left">{Languages.find((language) => language.value === targetLanguage)?.label}</div>
                       <ChevronsUpDown className="opacity-50" />
                     </Button>
                   </PopoverTrigger>
