@@ -173,7 +173,7 @@ const Entry = () => {
               <ArrowRight size={20} className="mx-2" />
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" size={"sm"} className={cn("backdrop-blur-2xl justify-between", !targetLanguage && "text-muted-foreground")}>
+                  <Button variant="outline" size={"sm"} className={cn("w-28 justify-between", !targetLanguage && "text-muted-foreground")}>
                     <div className="overflow-hidden overflow-ellipsis text-left">{Languages.find((language) => language.value === targetLanguage)?.label}</div>
                     <ChevronsUpDown className="opacity-50" />
                   </Button>
