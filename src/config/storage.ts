@@ -3,4 +3,5 @@ export enum StorageKeys {
   API_URL = "API_URL",
   MODEL_ID = "MODEL_ID",
   TARGET_LANGUAGE = "TARGET_LANGUAGE",
+  LEARNING_MODE = "LEARNING_MODE"
 }

@@ -164,36 +164,38 @@ const Entry = () => {
           >
             <div className="min-h-6">{targetText}</div>
             <Separator className="mt-3 mb-1.5 bg-slate-300/70" />
-            <div className="flex items-center">
-              <Button disabled variant="outline" size={"sm"} className={cn("justify-between", !targetLanguage && "text-muted-foreground")}>
-                <div className="w-24 overflow-hidden overflow-ellipsis text-left">Any Language</div>
-                <ChevronsUpDown className="opacity-50" />
-              </Button>
-              <ArrowRight size={20} className="mx-2" />
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" size={"sm"} className={cn("w-28 justify-between", !targetLanguage && "text-muted-foreground")}>
-                    <div className="overflow-hidden overflow-ellipsis text-left">{Languages.find((language) => language.value === targetLanguage)?.label}</div>
-                    <ChevronsUpDown className="opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-28 p-0 bg-transparent backdrop-blur-2xl">
-                  <Command>
-                    <CommandInput placeholder="Search" className="h-9" />
-                    <CommandList>
-                      <CommandEmpty>No language found.</CommandEmpty>
-                      <CommandGroup>
-                        {Languages.map((language) => (
-                          <CommandItem value={language.label} key={language.value} onSelect={() => handleTargetLanguageChange(language.value)}>
-                            {language.label}
-                            <Check className={cn("ml-auto", language.value === targetLanguage ? "opacity-100" : "opacity-0")} />
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
+            <div>
+              <div className="flex items-center">
+                <Button disabled variant="outline" size={"sm"} className={cn("justify-between", !targetLanguage && "text-muted-foreground")}>
+                  <div className="w-24 overflow-hidden overflow-ellipsis text-left">Any Language</div>
+                  <ChevronsUpDown className="opacity-50" />
+                </Button>
+                <ArrowRight size={20} className="mx-2" />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" size={"sm"} className={cn("w-28 justify-between", !targetLanguage && "text-muted-foreground")}>
+                      <div className="overflow-hidden overflow-ellipsis text-left">{Languages.find((language) => language.value === targetLanguage)?.label}</div>
+                      <ChevronsUpDown className="opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-28 p-0">
+                    <Command>
+                      <CommandInput placeholder="Search" className="h-9" />
+                      <CommandList>
+                        <CommandEmpty>No language found.</CommandEmpty>
+                        <CommandGroup>
+                          {Languages.map((language) => (
+                            <CommandItem value={language.label} key={language.value} onSelect={() => handleTargetLanguageChange(language.value)}>
+                              {language.label}
+                              <Check className={cn("ml-auto", language.value === targetLanguage ? "opacity-100" : "opacity-0")} />
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
           </motion.div>
         )}
