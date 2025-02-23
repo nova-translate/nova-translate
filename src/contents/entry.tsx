@@ -59,6 +59,7 @@ const Entry = () => {
     getTranslatedText(sourceText);
   };
 
+  // listen to the AI port for stream result from background
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     const listener = aiPort.listen((message) => {

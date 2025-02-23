@@ -36,8 +36,9 @@ function IndexPopup() {
 
   return (
     <div className="w-[450px] p-4">
+      <h4 className="text-base font-medium mb-3">Model Provider</h4>
       <Label htmlFor="apiKey" className="flex items-center">
-        API Key
+        API Key:
       </Label>
       <Input
         id="apiKey"
@@ -50,12 +51,12 @@ function IndexPopup() {
       />
 
       <Label htmlFor="apiUrl" className="flex items-center">
-        API URL
+        API URL:
       </Label>
       <Input id="apiUrl" className="mb-3 text-sm" placeholder="请输入" value={apiUrl} onChange={handleApiUrlChange} />
 
       <Label htmlFor="modeId" className="flex items-center">
-        Model ID
+        Model ID:
       </Label>
       <Input id="modeId" className="mb-3 text-sm" placeholder="请输入" value={modelId} onChange={handleModelIdChange} />
     </div>
