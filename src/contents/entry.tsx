@@ -1,18 +1,20 @@
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import Mousetrap from "mousetrap";
-import { usePort } from "@plasmohq/messaging/hook";
-import { ArrowRight, Check, ChevronsUpDown, LoaderCircle } from "lucide-react";
-import { LanguageEnum, Languages, MAX_TRANSLATION_LENGTH } from "@/config/common";
+import { debounce, uniqueId } from "lodash-es";
+import { ArrowRight, Bold, Check, ChevronsUpDown, LoaderCircle, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Toggle } from "@/components/ui/toggle";
 import { Separator } from "@/components/ui/separator";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { cn } from "@/lib/utils";
-import { debounce, uniqueId } from "lodash-es";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useStorage } from "@plasmohq/storage/hook";
+import { usePort } from "@plasmohq/messaging/hook";
 import { StorageKeys } from "@/config/storage";
 import { MessageTypes } from "@/config/message";
+import { cn } from "@/lib/utils";
+import { LanguageEnum, Languages, MAX_TRANSLATION_LENGTH } from "@/config/common";
 
 import cssText from "data-text:@/styles/contents.css";
 
@@ -33,6 +35,9 @@ const Entry = () => {
     if (value === undefined) return LanguageEnum.English;
     return value;
   });
+  const [learningModeState, setLearningModeState] = useStorage<boolean>(StorageKeys.LEARNING_MODE);
+
+  console.log("learningModeState", learningModeState);
 
   // bottom middle of the selected text
   const entryPanelPosition = useMemo(() => {
@@ -57,6 +62,10 @@ const Entry = () => {
   const handleTargetLanguageChange = (language: LanguageEnum) => {
     setTargetLanguage(language);
     getTranslatedText(sourceText);
+  };
+
+  const handleLearningModeChange = (value: boolean) => {
+    setLearningModeState(value);
   };
 
   // listen to the AI port for stream result from background
@@ -157,14 +166,14 @@ const Entry = () => {
       <AnimatePresence>
         {showEntryPanel && (
           <motion.div
-            className="fixed -translate-x-1/2 w-96 py-2 px-3 shadow-lg rounded-lg base-background base-border base-font"
+            className="fixed -translate-x-1/2 w-[400px] py-2 px-3 shadow-lg rounded-lg base-background base-border base-font"
             initial={{ opacity: 0, x: entryPanelPosition.x, y: entryPanelPosition.y }}
             animate={{ opacity: 1, x: entryPanelPosition.x, y: entryPanelPosition.y }}
             exit={{ opacity: 0 }}
           >
             <div className="min-h-6">{targetText}</div>
             <Separator className="mt-3 mb-1.5 bg-slate-300/70" />
-            <div>
+            <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <Button disabled variant="outline" size={"sm"} className={cn("justify-between", !targetLanguage && "text-muted-foreground")}>
                   <div className="w-24 overflow-hidden overflow-ellipsis text-left">Any Language</div>
@@ -196,6 +205,21 @@ const Entry = () => {
                   </PopoverContent>
                 </Popover>
               </div>
+
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div>
+                      <Toggle className="hover:bg-cyan-200/50 data-[state=on]:bg-cyan-300/70" pressed={learningModeState} onPressedChange={handleLearningModeChange}>
+                        <Zap />
+                      </Toggle>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Learning Mode</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           </motion.div>
         )}
