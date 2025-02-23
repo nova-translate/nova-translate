@@ -12,9 +12,9 @@ import { cn } from "@/lib/utils";
 import { debounce, uniqueId } from "lodash-es";
 import { useStorage } from "@plasmohq/storage/hook";
 import { StorageKeys } from "@/config/storage";
-
-import cssText from "data-text:@/styles/globals.css";
 import { MessageTypes } from "@/config/message";
+
+import cssText from "data-text:@/styles/contents.css";
 
 export const getStyle = () => {
   const style = document.createElement("style");
@@ -156,14 +156,13 @@ const Entry = () => {
       <AnimatePresence>
         {showEntryPanel && (
           <motion.div
-            id="entry-panel-container"
-            className="fixed w-96 py-2 px-3 border border-gray-200 shadow-lg rounded-md -translate-x-1/2"
+            className="fixed -translate-x-1/2 w-96 py-2 px-3 shadow-lg rounded-lg base-background base-border base-font"
             initial={{ opacity: 0, x: entryPanelPosition.x, y: entryPanelPosition.y }}
             animate={{ opacity: 1, x: entryPanelPosition.x, y: entryPanelPosition.y }}
             exit={{ opacity: 0 }}
           >
             <div className="min-h-6">{targetText}</div>
-            <Separator className="mt-3 mb-1.5" />
+            <Separator className="mt-3 mb-1.5 bg-slate-300/70" />
             <div className="flex items-center">
               <Button disabled variant="outline" size={"sm"} className={cn("justify-between", !targetLanguage && "text-muted-foreground")}>
                 <div className="w-24 overflow-hidden overflow-ellipsis text-left">Any Language</div>

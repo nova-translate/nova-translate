@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
+  :host {
     --background: 0 0% 100%;
     --foreground: 222.2 47.4% 11.2%;
     --muted: 210 40% 96.1%;
@@ -46,5 +46,19 @@
     --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
     --ring: 216 34% 17%;
+  }
+}
+
+@layer base {
+  .base-background {
+    @apply bg-slate-100/50 dark:bg-slate-100/70 backdrop-blur;
+  }
+
+  .base-border {
+    @apply border border-slate-300/70;
+  }
+
+  .base-font {
+    @apply font-sans antialiased text-[14px] text-black;
   }
 }
