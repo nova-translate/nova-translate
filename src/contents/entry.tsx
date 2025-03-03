@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import Mousetrap from "mousetrap";
-import { debounce, uniqueId } from "lodash-es";
+import { debounce, split, uniqueId, map } from "lodash-es";
 import { ArrowRight, Check, ChevronsUpDown, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Toggle } from "@/components/ui/toggle";
@@ -14,9 +14,10 @@ import { usePort } from "@plasmohq/messaging/hook";
 import { StorageKeys } from "@/config/storage";
 import { MessageTypes } from "@/config/message";
 import { cn } from "@/lib/utils";
-import { LanguageEnum, Languages, MAX_TRANSLATION_LENGTH } from "@/config/common";
+import { LanguageEnum, Languages, MAX_TRANSLATION_LENGTH, TextTypes } from "@/config/common";
 
 import cssText from "data-text:@/styles/contents.css";
+import type { SingleWordInfoType } from "@/background/ports/ai";
 
 export const getStyle = () => {
   const style = document.createElement("style");
@@ -28,7 +29,10 @@ const Entry = () => {
   const aiPort = usePort("ai");
   const [sourceText, setSourceText] = useState("");
   const [textId, setTextId] = useState("");
+  const [textType, setTextType] = useState("");
   const [targetText, setTargetText] = useState("");
+  const [targetWordData, setTargetWordData] = useState<SingleWordInfoType>();
+  const [errorMessage, setErrorMessage] = useState("");
   const [showEntryPanel, setShowEntryPanel] = useState(false);
   const [sourceTextRect, setSourceTextRect] = useState({ left: 0, right: 0, top: 0, bottom: 0 });
   const [languageOptionsOpen, setLanguageOptionsOpen] = useState(false);
@@ -41,20 +45,25 @@ const Entry = () => {
   // bottom middle of the selected text
   const entryPanelPosition = useMemo(() => {
     return {
-      x: sourceTextRect.left + (sourceTextRect.right - sourceTextRect.left) / 2,
+      x: sourceTextRect.left + (sourceTextRect.right - sourceTextRect.left) / 2 - 200,
       y: sourceTextRect.bottom + 10
     };
   }, [sourceTextRect.left, sourceTextRect.right, sourceTextRect.bottom]);
 
   const getTranslatedText = async (selectedText: string) => {
     const id = uniqueId();
+    const textType = split(selectedText, " ").length > 1 ? TextTypes.LONG_TEXT : TextTypes.SINGLE_WORD;
+
     setTextId(id);
+    setTextType(textType);
     setTargetText("");
-    setSourceText(selectedText);
+    setErrorMessage("");
+    setTargetWordData(undefined);
 
     aiPort.send({
       uniqueId: id,
-      text: selectedText || sourceText
+      textType,
+      text: selectedText
     });
   };
 
@@ -74,19 +83,24 @@ const Entry = () => {
       const { messageType, data } = message;
 
       if (messageType === MessageTypes.TRANSLATE_TEXT_PART) {
-        const { uniqueId, text } = data;
+        const { uniqueId, textType, text, wordData } = data;
         if (uniqueId !== textId) return;
 
-        setTargetText((prev) => {
-          return prev + text;
-        });
+        if (textType === TextTypes.SINGLE_WORD) {
+          setTargetWordData(wordData);
+        }
+
+        if (textType === TextTypes.LONG_TEXT) {
+          setTargetText((prev) => {
+            return prev + text;
+          });
+        }
       }
 
       if (messageType === MessageTypes.TRANSLATE_TEXT_ERROR) {
         const { uniqueId, error } = data;
         if (uniqueId !== textId) return;
-
-        setTargetText(error.message);
+        setErrorMessage(error.message);
       }
     });
 
@@ -117,6 +131,7 @@ const Entry = () => {
 
       setShowEntryPanel(true);
       setSourceTextRect({ left, right, top, bottom });
+      setSourceText(selectedText);
       getTranslatedText(selectedText);
     });
   }, []);
@@ -230,8 +245,25 @@ const Entry = () => {
                 </Tooltip>
               </TooltipProvider>
             </div>
+
             <Separator className="my-3 bg-slate-200/70" />
-            <div className="min-h-6">{targetText}</div>
+
+            {textType === TextTypes.LONG_TEXT && <div className="min-h-6">{targetText}</div>}
+            {textType === TextTypes.SINGLE_WORD && (
+              <div className="min-h-6">
+                <h4>译文</h4>
+                {targetWordData?.translation}
+                <h4>词性</h4>
+                {targetWordData?.partOfSpeech}
+                <h4>例句</h4>
+                {map(targetWordData?.examples, (item) => (
+                  <div key={item.id}>
+                    <p>{item.source}</p>
+                    <p>{item.target}</p>
+                  </div>
+                ))}
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

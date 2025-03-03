@@ -16,3 +16,8 @@ export const Languages = [
   { value: LanguageEnum.Japanese, label: "Japanese" },
   { value: LanguageEnum.Korean, label: "Korean" }
 ];
+
+export enum TextTypes {
+  SINGLE_WORD = "SINGLE_WORD",
+  LONG_TEXT = "LONG_TEXT"
+}
