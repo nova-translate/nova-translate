@@ -51,7 +51,7 @@
 
 @layer base {
   .base-background {
-    @apply bg-slate-100/60 dark:bg-slate-100/70 backdrop-blur;
+    @apply bg-cyan-50/70 dark:bg-cyan-50/80 backdrop-blur-md;
   }
 
   .base-border {

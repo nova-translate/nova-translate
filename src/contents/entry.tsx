@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import Mousetrap from "mousetrap";
 import { debounce, uniqueId } from "lodash-es";
-import { ArrowRight, Bold, Check, ChevronsUpDown, LoaderCircle, Zap } from "lucide-react";
+import { ArrowRight, Check, ChevronsUpDown, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Toggle } from "@/components/ui/toggle";
 import { Separator } from "@/components/ui/separator";
@@ -31,6 +31,7 @@ const Entry = () => {
   const [targetText, setTargetText] = useState("");
   const [showEntryPanel, setShowEntryPanel] = useState(false);
   const [sourceTextRect, setSourceTextRect] = useState({ left: 0, right: 0, top: 0, bottom: 0 });
+  const [languageOptionsOpen, setLanguageOptionsOpen] = useState(false);
   const [targetLanguage, setTargetLanguage] = useStorage(StorageKeys.TARGET_LANGUAGE, (value) => {
     if (value === undefined) return LanguageEnum.English;
     return value;
@@ -169,8 +170,6 @@ const Entry = () => {
             animate={{ opacity: 1, x: entryPanelPosition.x, y: entryPanelPosition.y }}
             exit={{ opacity: 0 }}
           >
-            <div className="min-h-6">{targetText}</div>
-            <Separator className="mt-3 mb-1.5 bg-slate-300/70" />
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <Button disabled variant="outline" size={"sm"} className={cn("justify-between", !targetLanguage && "text-muted-foreground")}>
@@ -178,7 +177,7 @@ const Entry = () => {
                   <ChevronsUpDown className="opacity-50" />
                 </Button>
                 <ArrowRight size={20} className="mx-2" />
-                <Popover>
+                <Popover open={languageOptionsOpen} onOpenChange={setLanguageOptionsOpen}>
                   <PopoverTrigger asChild>
                     <Button variant="outline" size={"sm"} className={cn("w-28 justify-between", !targetLanguage && "text-muted-foreground")}>
                       <div className="overflow-hidden overflow-ellipsis text-left">{Languages.find((language) => language.value === targetLanguage)?.label}</div>
@@ -187,12 +186,19 @@ const Entry = () => {
                   </PopoverTrigger>
                   <PopoverContent className="w-28 p-0">
                     <Command>
-                      <CommandInput placeholder="Search" className="h-9" />
+                      {/* <CommandInput placeholder="Search" className="h-9" /> */}
                       <CommandList>
                         <CommandEmpty>No language found.</CommandEmpty>
                         <CommandGroup>
                           {Languages.map((language) => (
-                            <CommandItem value={language.label} key={language.value} onSelect={() => handleTargetLanguageChange(language.value)}>
+                            <CommandItem
+                              value={language.label}
+                              key={language.value}
+                              onSelect={() => {
+                                handleTargetLanguageChange(language.value);
+                                setLanguageOptionsOpen(false);
+                              }}
+                            >
                               {language.label}
                               <Check className={cn("ml-auto", language.value === targetLanguage ? "opacity-100" : "opacity-0")} />
                             </CommandItem>
@@ -208,7 +214,12 @@ const Entry = () => {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <div>
-                      <Toggle className="hover:bg-cyan-200/50 data-[state=on]:bg-cyan-300/70" pressed={learningModeState} onPressedChange={handleLearningModeChange}>
+                      <Toggle
+                        className="hover:bg-cyan-200/50 data-[state=on]:bg-cyan-300/70 data-[state=on]:shadow"
+                        size={"sm"}
+                        pressed={learningModeState}
+                        onPressedChange={handleLearningModeChange}
+                      >
                         <Zap />
                       </Toggle>
                     </div>
@@ -219,6 +230,8 @@ const Entry = () => {
                 </Tooltip>
               </TooltipProvider>
             </div>
+            <Separator className="my-3 bg-slate-200/70" />
+            <div className="min-h-6">{targetText}</div>
           </motion.div>
         )}
       </AnimatePresence>
