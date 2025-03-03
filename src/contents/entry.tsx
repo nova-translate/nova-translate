@@ -37,8 +37,6 @@ const Entry = () => {
   });
   const [learningModeState, setLearningModeState] = useStorage<boolean>(StorageKeys.LEARNING_MODE);
 
-  console.log("learningModeState", learningModeState);
-
   // bottom middle of the selected text
   const entryPanelPosition = useMemo(() => {
     return {
