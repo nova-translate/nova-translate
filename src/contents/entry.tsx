@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import Mousetrap from "mousetrap";
-import { debounce, split, uniqueId, map } from "lodash-es";
+import { debounce, split, uniqueId, map, join } from "lodash-es";
 import { ArrowRight, Check, ChevronsUpDown, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Toggle } from "@/components/ui/toggle";
@@ -224,26 +224,6 @@ const Entry = () => {
                   </PopoverContent>
                 </Popover>
               </div>
-
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div>
-                      <Toggle
-                        className="hover:bg-cyan-200/50 data-[state=on]:bg-cyan-300/70 data-[state=on]:shadow"
-                        size={"sm"}
-                        pressed={learningModeState}
-                        onPressedChange={handleLearningModeChange}
-                      >
-                        <Zap />
-                      </Toggle>
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Learning Mode</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
             </div>
 
             <Separator className="my-3 bg-slate-200/70" />
@@ -251,16 +231,24 @@ const Entry = () => {
             {textType === TextTypes.LONG_TEXT && <div className="min-h-6">{targetText}</div>}
             {textType === TextTypes.SINGLE_WORD && (
               <div className="min-h-6">
-                <h4>译文</h4>
-                {targetWordData?.translation}
-                <h4>词性</h4>
-                {targetWordData?.partOfSpeech}
-                <h4>例句</h4>
+                <div>
+                  {targetWordData && <span className="mr-3 text-[18px] font-bold">{sourceText}</span>}
+                  {targetWordData?.pronunciation && <span className="mr-2 text-gray-600">[{targetWordData?.pronunciation}]</span>}
+                </div>
+                <div className="text-gray-800">
+                  <span className="mr-2">{targetWordData?.partOfSpeech}</span>
+                  {join(targetWordData?.translation, ", ")}
+                </div>
+
+                {targetWordData?.examples && targetWordData.examples.length > 0 && <h4 className="mt-8 mb-1 font-semibold">Examples</h4>}
+
                 {map(targetWordData?.examples, (item) => (
-                  <div key={item.id}>
-                    <p>{item.source}</p>
-                    <p>{item.target}</p>
-                  </div>
+                  <ul className="mb-3 px-4 text-gray-800 list-disc" key={item.id}>
+                    <li>
+                      <p className="leading-snug">{item.source}</p>
+                      <p className="leading-snug">{item.target}</p>
+                    </li>
+                  </ul>
                 ))}
               </div>
             )}

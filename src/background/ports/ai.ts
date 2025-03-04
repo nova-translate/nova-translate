@@ -28,8 +28,9 @@ storage.watch({
 });
 
 const SingleWordInfoSchema = z.object({
-  translation: z.string(),
+  pronunciation: z.string(),
   partOfSpeech: z.string(),
+  translation: z.array(z.string()),
   examples: z.array(z.object({ id: z.string(), source: z.string(), target: z.string() }))
 });
 
@@ -50,6 +51,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
       2. Retain the original form of professional terms;
       3. Do not explain the translation result;
       4. Use spaces reasonably to make the result more readable, for example, by separating Chinese and English with spaces;
+      5. If the provided language and the target language are the same, return it as is;
       Please translate the following sentence: ${sourceText}`,
       onFinish({ finishReason }) {
         res.send({
@@ -82,8 +84,10 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
       prompt: `Your goal is to translate words from any language into [${targetLanguage}].
       Here are the specific requirements:
       1. Provide word translation;
-      2. Provide part of speech (using the target language);
-      3. Provide multiple sentence examples;
+      2. If the source language has pronunciation (such as phonetic symbols, pinyin, etc.), please provide it;
+      3. Provide part of speech (using the source language);
+      4. Provide 3 sentence examples;
+      5. If the provided language and the target language are the same, return it as is;
       Please translate the following word: ${sourceText}`,
       schema: SingleWordInfoSchema,
       onFinish({ object }) {
@@ -95,6 +99,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
         });
       },
       onError({ error }) {
+        console.error(error);
         res.send({
           messageType: MessageTypes.TRANSLATE_TEXT_ERROR,
           data: { uniqueId, textType, error }
