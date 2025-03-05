@@ -37,7 +37,7 @@ const SingleWordInfoSchema = z.object({
 export type SingleWordInfoType = z.infer<typeof SingleWordInfoSchema>;
 
 const handler: PlasmoMessaging.PortHandler = async (req, res) => {
-  const { uniqueId, textType, text: sourceText } = req.body as { uniqueId: string; textType: TextTypes; text: string };
+  const { uniqueId, textType, text: sourceText, context } = req.body as { uniqueId: string; textType: TextTypes; text: string; context: string };
   const modelId = await storage.get(StorageKeys.MODEL_ID);
   const targetLanguage = await storage.get(StorageKeys.TARGET_LANGUAGE);
 
@@ -88,7 +88,8 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
       3. Provide part of speech (using the source language);
       4. Provide 3 sentence examples;
       5. If the provided language and the target language are the same, return it as is;
-      Please translate the following word: ${sourceText}`,
+      6. The result should be consistent with the context, the context is: [${context}];
+      Please translate the following word: [${sourceText}]`,
       schema: SingleWordInfoSchema,
       onFinish({ object }) {
         if (object === undefined) return;

@@ -27,6 +27,7 @@ export const getStyle = () => {
 
 const Entry = () => {
   const aiPort = usePort("ai");
+  const [context, setContext] = useState("");
   const [sourceText, setSourceText] = useState("");
   const [textId, setTextId] = useState("");
   const [textType, setTextType] = useState("");
@@ -50,7 +51,7 @@ const Entry = () => {
     };
   }, [sourceTextRect.left, sourceTextRect.right, sourceTextRect.bottom]);
 
-  const getTranslatedText = async (selectedText: string) => {
+  const getTranslatedText = async (selectedText: string, selectedTextContext: string) => {
     const id = uniqueId();
     const textType = split(selectedText, " ").length > 1 ? TextTypes.LONG_TEXT : TextTypes.SINGLE_WORD;
 
@@ -63,13 +64,14 @@ const Entry = () => {
     aiPort.send({
       uniqueId: id,
       textType,
-      text: selectedText
+      text: selectedText,
+      context: selectedTextContext
     });
   };
 
   const handleTargetLanguageChange = (language: LanguageEnum) => {
     setTargetLanguage(language);
-    getTranslatedText(sourceText);
+    getTranslatedText(sourceText, context);
   };
 
   const handleLearningModeChange = (value: boolean) => {
@@ -126,13 +128,25 @@ const Entry = () => {
       const rect = range.getBoundingClientRect();
       const { left, right, top, bottom } = rect;
 
+      let selectedTextContext = "";
+      const ContentLength = 100;
+      const startNode = range.startContainer;
+
+      if (startNode.nodeType === Node.TEXT_NODE) {
+        const fullText = startNode.textContent || "";
+        const startOffset = Math.max(range.startOffset - ContentLength, 0);
+        const endOffset = Math.min(range.endOffset + ContentLength, fullText.length);
+        selectedTextContext = fullText.slice(startOffset, endOffset);
+        setContext(selectedTextContext);
+      }
+
       let selectedText = selection.toString().trim();
       selectedText = selectedText.slice(0, MAX_TRANSLATION_LENGTH);
 
       setShowEntryPanel(true);
       setSourceTextRect({ left, right, top, bottom });
       setSourceText(selectedText);
-      getTranslatedText(selectedText);
+      getTranslatedText(selectedText, selectedTextContext);
     });
   }, []);
 
@@ -231,13 +245,15 @@ const Entry = () => {
             {textType === TextTypes.LONG_TEXT && <div className="min-h-6">{targetText}</div>}
             {textType === TextTypes.SINGLE_WORD && (
               <div className="min-h-6">
-                <div>
+                <div className="flex items-center mb-1">
                   {targetWordData && <span className="mr-3 text-[18px] font-bold">{sourceText}</span>}
-                  {targetWordData?.pronunciation && <span className="mr-2 text-gray-600">[{targetWordData?.pronunciation}]</span>}
+                  {targetWordData?.pronunciation && <span className="mr-2 text-slate-600">[{targetWordData?.pronunciation}]</span>}
                 </div>
-                <div className="text-gray-800">
-                  <span className="mr-2">{targetWordData?.partOfSpeech}</span>
+                <div className="flex text-gray-800 h-[12px] items-center">
                   {join(targetWordData?.translation, ", ")}
+                  {targetWordData?.partOfSpeech && targetWordData?.translation && <Separator className="mx-2 bg-slate-500/60" orientation="vertical" />}
+
+                  <span>{targetWordData?.partOfSpeech}</span>
                 </div>
 
                 {targetWordData?.examples && targetWordData.examples.length > 0 && <h4 className="mt-8 mb-1 font-semibold">Examples</h4>}
