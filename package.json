@@ -1,8 +1,8 @@
 {
-  "name": "ai-translator",
-  "displayName": "AI Translator",
+  "name": "seamoth-translator",
+  "displayName": "Seamoth Translator",
   "version": "0.0.1",
-  "description": "A translator tool based on AI LLM",
+  "description": "An AI LLM-based translator tool, supporting long text translation and single word translation",
   "author": "lucas.liuchao@gmail.com",
   "scripts": {
     "dev": "plasmo dev",
