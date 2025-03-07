@@ -5,6 +5,7 @@ export const PLASMO_CONTAINER_Z_INDEX = 2147483647;
 export const DEFAULT_SHORTCUT = "alt+n";
 
 export enum LanguageEnum {
+  Chinese = "zh",
   Chinese_Simplified = "zh-CN",
   English = "en",
   Russian = "ru",

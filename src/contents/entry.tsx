@@ -11,7 +11,7 @@ import { useStorage } from "@plasmohq/storage/hook";
 import { usePort } from "@plasmohq/messaging/hook";
 import { StorageKeys } from "@/config/storage";
 import { MessageTypes } from "@/config/message";
-import { cn } from "@/lib/utils";
+import { checkTextType, cn } from "@/lib/utils";
 import { DEFAULT_SHORTCUT, LanguageEnum, Languages, MAX_TRANSLATION_LENGTH, TextTypes } from "@/config/common";
 
 import cssText from "data-text:@/styles/contents.css";
@@ -52,7 +52,7 @@ const Entry = () => {
 
   const getTranslatedText = async (selectedText: string, selectedTextContext: string) => {
     const id = uniqueId();
-    const textType = split(selectedText, " ").length > 1 ? TextTypes.LONG_TEXT : TextTypes.SINGLE_WORD;
+    const textType = await checkTextType(selectedText);
 
     setTextId(id);
     setTextType(textType);
