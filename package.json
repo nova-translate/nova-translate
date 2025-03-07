@@ -1,6 +1,6 @@
 {
-  "name": "seamoth-translator",
-  "displayName": "Seamoth Translator",
+  "name": "nova-translate",
+  "displayName": "Nova Translate",
   "version": "0.0.1",
   "description": "An AI LLM-based translator tool, supporting long text translation and single word translation",
   "author": "lucas.liuchao@gmail.com",

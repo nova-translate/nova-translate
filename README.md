@@ -1,3 +1,3 @@
-# AI Translator
+# Nova Translate
 
-A translator tool based on AI LLM
+An AI LLM-based translator tool, supporting long text translation and single word translation
