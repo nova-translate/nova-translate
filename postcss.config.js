@@ -4,6 +4,8 @@
 module.exports = {
   plugins: {
     tailwindcss: {},
-    autoprefixer: {}
+    autoprefixer: {},
+    '@thedutchcoder/postcss-rem-to-px': {},
+    ...(process.env.NODE_ENV === 'production' ? { cssnano: {} } : {})
   }
 }

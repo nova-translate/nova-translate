@@ -43,6 +43,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
+    "@thedutchcoder/postcss-rem-to-px": "^0.0.2",
     "@types/chrome": "0.0.251",
     "@types/lodash-es": "^4.17.12",
     "@types/mousetrap": "^1.6.15",

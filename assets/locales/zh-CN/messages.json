@@ -1,12 +1,12 @@
 {
   "setting_basic_title": {
-    "message": "Basic"
+    "message": "基础配置"
   },
   "setting_basic_shortcut": {
-    "message": "Keyboard shortcut"
+    "message": "键盘快捷键"
   },
   "setting_model_title": {
-    "message": "Model Provider"
+    "message": "模型提供商"
   },
   "setting_model_id": {
     "message": "Model ID"
@@ -18,21 +18,21 @@
     "message": "API URL"
   },
   "entry_panel_source_language": {
-    "message": "Any Language"
+    "message": "任何语言"
   },
   "entry_panel_target_language_chinese_simplified": {
-    "message": "Chinese (Simplified)"
+    "message": "中文（简体）"
   },
   "entry_panel_target_language_english": {
-    "message": "English"
+    "message": "英语"
   },
   "entry_panel_target_language_japanese": {
-    "message": "Japanese"
+    "message": "日语"
   },
   "entry_panel_target_language_korean": {
-    "message": "Korean"
+    "message": "韩语"
   },
   "entry_panel_target_language_russian": {
-    "message": "Russian"
+    "message": "俄语"
   }
 }

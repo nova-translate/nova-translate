@@ -51,7 +51,7 @@
 
 @layer base {
   .base-background {
-    @apply bg-slate-100/80 dark:bg-cyan-50/80 backdrop-blur-md;
+    @apply bg-slate-100/80 backdrop-blur-md;
   }
 
   .base-border {
@@ -59,6 +59,6 @@
   }
 
   .base-font {
-    @apply font-sans antialiased text-[14px] text-black;
+    @apply font-sans antialiased text-black;
   }
 }

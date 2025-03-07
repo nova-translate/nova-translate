@@ -57,10 +57,8 @@ function IndexPopup() {
               </SelectTrigger>
               <SelectContent className="w-36 text-sm">
                 <SelectGroup>
-                  <SelectItem value="alt+n">Alt + N</SelectItem>
-                  <SelectItem value="alt+p">Alt + P</SelectItem>
-                  <SelectItem value="alt+shift+p">Alt + Shift + P</SelectItem>
-                  <SelectItem value="ctrl+alt+p">Ctrl + Alt + P</SelectItem>
+                  <SelectItem value="ctrl+alt+n">Ctrl + Alt + N</SelectItem>
+                  <SelectItem value="ctrl+alt+t">Ctrl + Alt + T</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>

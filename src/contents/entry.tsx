@@ -69,6 +69,7 @@ const Entry = () => {
   };
 
   const handleTargetLanguageChange = (language: LanguageEnum) => {
+    if (language === targetLanguage) return;
     setTargetLanguage(language);
     getTranslatedText(sourceText, context);
   };
@@ -193,50 +194,51 @@ const Entry = () => {
       <AnimatePresence>
         {showEntryPanel && (
           <motion.div
-            className="-translate-x-1/2 base-background base-border base-font fixed w-[400px] rounded-lg px-3 py-2 shadow-lg"
+            className="-translate-x-1/2 base-background base-border base-font fixed w-[400px] rounded-lg px-3 py-2 text-sm shadow-lg"
             initial={{ opacity: 0, x: entryPanelPosition.x, y: entryPanelPosition.y }}
             animate={{ opacity: 1, x: entryPanelPosition.x, y: entryPanelPosition.y }}
             exit={{ opacity: 0 }}
           >
             <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <Button disabled variant="outline" size={"sm"} className={cn("justify-between", !targetLanguage && "text-muted-foreground")}>
-                  <div className="w-24 overflow-hidden overflow-ellipsis text-left">Any Language</div>
-                  <ChevronsUpDown className="opacity-50" />
-                </Button>
-                <ArrowRight size={20} className="mx-2" />
-                <Popover open={languageOptionsOpen} onOpenChange={setLanguageOptionsOpen}>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" size={"sm"} className={cn("w-28 justify-between", !targetLanguage && "text-muted-foreground")}>
-                      <div className="overflow-hidden overflow-ellipsis text-left">{Languages.find((language) => language.value === targetLanguage)?.label}</div>
-                      <ChevronsUpDown className="opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-28 p-0">
-                    <Command>
-                      {/* <CommandInput placeholder="Search" className="h-9" /> */}
-                      <CommandList>
-                        <CommandEmpty>No language found.</CommandEmpty>
-                        <CommandGroup>
-                          {Languages.map((language) => (
-                            <CommandItem
-                              value={language.label}
-                              key={language.value}
-                              onSelect={() => {
-                                handleTargetLanguageChange(language.value);
-                                setLanguageOptionsOpen(false);
-                              }}
-                            >
+              <Button disabled variant="outline" size={"sm"} className={cn("w-40 justify-between", !targetLanguage && "text-muted-foreground")}>
+                <div className="overflow-hidden overflow-ellipsis text-left">{chrome.i18n.getMessage("entry_panel_source_language")}</div>
+                <ChevronsUpDown className="opacity-50" />
+              </Button>
+
+              <ArrowRight size={20} className="mx-2" />
+
+              <Popover open={languageOptionsOpen} onOpenChange={setLanguageOptionsOpen}>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size={"sm"} className={cn("w-40 justify-between", !targetLanguage && "text-muted-foreground")}>
+                    <div className="overflow-hidden overflow-ellipsis text-left">{Languages.find((language) => language.value === targetLanguage)?.label}</div>
+                    <ChevronsUpDown className="opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-40 p-0">
+                  <Command>
+                    <CommandList>
+                      <CommandEmpty>No language found.</CommandEmpty>
+                      <CommandGroup>
+                        {Languages.map((language) => (
+                          <CommandItem
+                            value={language.label}
+                            key={language.value}
+                            onSelect={() => {
+                              handleTargetLanguageChange(language.value);
+                              setLanguageOptionsOpen(false);
+                            }}
+                          >
+                            <div className="overflow-hidden overflow-ellipsis text-nowrap text-xs" title={language.label}>
                               {language.label}
-                              <Check className={cn("ml-auto", language.value === targetLanguage ? "opacity-100" : "opacity-0")} />
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-              </div>
+                            </div>
+                            <Check className={cn("ml-auto", language.value === targetLanguage ? "opacity-100" : "opacity-0")} />
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
 
             <Separator className="my-3 bg-slate-300/70 dark:bg-slate-200/70" />
@@ -253,18 +255,18 @@ const Entry = () => {
               <div className="min-h-6">
                 <div className="mb-1 flex items-center">
                   {targetWordData && (
-                    <motion.span {...baseMotionProps} className="mr-3 font-bold text-[18px]">
+                    <motion.span {...baseMotionProps} className="mr-3 font-bold text-lg">
                       {sourceText}
                     </motion.span>
                   )}
                   {targetWordData?.pronunciation && (
-                    <motion.span {...baseMotionProps} className="mr-2 text-slate-600">
+                    <motion.span {...baseMotionProps} className="mr-2">
                       [{targetWordData?.pronunciation}]
                     </motion.span>
                   )}
                 </div>
 
-                <div className="flex h-[12px] items-center text-gray-800">
+                <div className="flex h-3 items-center text-gray-800">
                   {join(targetWordData?.translation, ", ")}
                   {targetWordData?.partOfSpeech && targetWordData?.translation && <Separator className="mx-2 bg-slate-500/60" orientation="vertical" />}
                   <motion.span {...baseMotionProps}>{targetWordData?.partOfSpeech}</motion.span>
