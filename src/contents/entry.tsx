@@ -37,6 +37,7 @@ const Entry = () => {
   const [showEntryPanel, setShowEntryPanel] = useState(false);
   const [sourceTextRect, setSourceTextRect] = useState({ left: 0, right: 0, top: 0, bottom: 0 });
   const [languageOptionsOpen, setLanguageOptionsOpen] = useState(false);
+  const [shortcut] = useStorage<string>(StorageKeys.SHORTCUT, "alt+shift+n");
   const [targetLanguage, setTargetLanguage] = useStorage(StorageKeys.TARGET_LANGUAGE, (value) => {
     if (value === undefined) return LanguageEnum.English;
     return value;
@@ -112,7 +113,7 @@ const Entry = () => {
   // get text from selection and show entry panel
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
-    Mousetrap.bind("option+n", () => {
+    Mousetrap.bind(shortcut, () => {
       const selection = window.getSelection();
       if (!selection) return;
 
@@ -148,7 +149,11 @@ const Entry = () => {
       setSourceText(selectedText);
       getTranslatedText(selectedText, selectedTextContext);
     });
-  }, []);
+
+    return () => {
+      Mousetrap.unbind(shortcut);
+    };
+  }, [shortcut]);
 
   // update entry panel position when scrolling the page
   useEffect(() => {
@@ -240,7 +245,7 @@ const Entry = () => {
               </div>
             </div>
 
-            <Separator className="my-3 bg-slate-200/70" />
+            <Separator className="my-3 bg-slate-300/70 dark:bg-slate-200/70" />
 
             {textType === TextTypes.LONG_TEXT && <div className="min-h-6">{targetText}</div>}
             {textType === TextTypes.SINGLE_WORD && (

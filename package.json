@@ -11,9 +11,7 @@
     "prepare": "husky install"
   },
   "dependencies": {
-    "@ai-sdk/deepseek": "0.1.10",
     "@ai-sdk/openai": "1.1.11",
-    "@hookform/resolvers": "4.0.0",
     "@plasmohq/messaging": "0.7.1",
     "@plasmohq/storage": "1.9.0",
     "@radix-ui/react-dialog": "^1.1.6",
