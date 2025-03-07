@@ -5,16 +5,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@radix-ui/react-label";
 import { StorageKeys } from "@/config/storage";
 import { useState } from "react";
-import { CircleX, Eye, EyeClosed } from "lucide-react";
+import { Eye, EyeClosed } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { Separator } from "@/components/ui/separator";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DEFAULT_SHORTCUT } from "@/config/common";
 
 function IndexPopup() {
   const [apiKey, setApiKey] = useStorage<string>(StorageKeys.API_KEY);
   const [apiUrl, setApiUrl] = useStorage<string>(StorageKeys.API_URL);
   const [modelId, setModelId] = useStorage<string>(StorageKeys.MODEL_ID);
-  const [shortcut, setShortcut] = useStorage<string>(StorageKeys.SHORTCUT, "Alt+Shift+N");
+  const [shortcut, setShortcut] = useStorage<string>(StorageKeys.SHORTCUT, DEFAULT_SHORTCUT);
   const [isApiKeyVisible, setIsApiKeyVisible] = useState(false);
 
   const handleApiKeyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,6 +57,7 @@ function IndexPopup() {
               </SelectTrigger>
               <SelectContent className="w-36 text-sm">
                 <SelectGroup>
+                  <SelectItem value="alt+n">Alt + N</SelectItem>
                   <SelectItem value="alt+p">Alt + P</SelectItem>
                   <SelectItem value="alt+shift+p">Alt + Shift + P</SelectItem>
                   <SelectItem value="ctrl+alt+p">Ctrl + Alt + P</SelectItem>

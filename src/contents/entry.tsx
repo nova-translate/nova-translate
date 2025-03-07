@@ -14,7 +14,7 @@ import { usePort } from "@plasmohq/messaging/hook";
 import { StorageKeys } from "@/config/storage";
 import { MessageTypes } from "@/config/message";
 import { cn } from "@/lib/utils";
-import { LanguageEnum, Languages, MAX_TRANSLATION_LENGTH, TextTypes } from "@/config/common";
+import { DEFAULT_SHORTCUT, LanguageEnum, Languages, MAX_TRANSLATION_LENGTH, TextTypes } from "@/config/common";
 
 import cssText from "data-text:@/styles/contents.css";
 import type { SingleWordInfoType } from "@/background/ports/ai";
@@ -37,7 +37,7 @@ const Entry = () => {
   const [showEntryPanel, setShowEntryPanel] = useState(false);
   const [sourceTextRect, setSourceTextRect] = useState({ left: 0, right: 0, top: 0, bottom: 0 });
   const [languageOptionsOpen, setLanguageOptionsOpen] = useState(false);
-  const [shortcut] = useStorage<string>(StorageKeys.SHORTCUT, "alt+shift+n");
+  const [shortcut] = useStorage<string>(StorageKeys.SHORTCUT, DEFAULT_SHORTCUT);
   const [targetLanguage, setTargetLanguage] = useStorage(StorageKeys.TARGET_LANGUAGE, (value) => {
     if (value === undefined) return LanguageEnum.English;
     return value;
