@@ -1,0 +1,20 @@
+{
+  "setting_basic_title": {
+    "message": "基础配置"
+  },
+  "setting_basic_shortcut": {
+    "message": "键盘快捷键"
+  },
+  "setting_model_title": {
+    "message": "模型提供商"
+  },
+  "setting_model_id": {
+    "message": "Model ID"
+  },
+  "setting_model_api_key": {
+    "message": "API key"
+  },
+  "setting_model_api_url": {
+    "message": "API URL"
+  }
+}

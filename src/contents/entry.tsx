@@ -2,13 +2,11 @@ import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import Mousetrap from "mousetrap";
 import { debounce, split, uniqueId, map, join } from "lodash-es";
-import { ArrowRight, Check, ChevronsUpDown, Zap } from "lucide-react";
+import { ArrowRight, Ban, Check, ChevronsUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Toggle } from "@/components/ui/toggle";
 import { Separator } from "@/components/ui/separator";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useStorage } from "@plasmohq/storage/hook";
 import { usePort } from "@plasmohq/messaging/hook";
 import { StorageKeys } from "@/config/storage";
@@ -18,6 +16,7 @@ import { DEFAULT_SHORTCUT, LanguageEnum, Languages, MAX_TRANSLATION_LENGTH, Text
 
 import cssText from "data-text:@/styles/contents.css";
 import type { SingleWordInfoType } from "@/background/ports/ai";
+import { baseMotionProps } from "@/config/motion";
 
 export const getStyle = () => {
   const style = document.createElement("style");
@@ -42,7 +41,6 @@ const Entry = () => {
     if (value === undefined) return LanguageEnum.English;
     return value;
   });
-  const [learningModeState, setLearningModeState] = useStorage<boolean>(StorageKeys.LEARNING_MODE);
 
   // bottom middle of the selected text
   const entryPanelPosition = useMemo(() => {
@@ -73,10 +71,6 @@ const Entry = () => {
   const handleTargetLanguageChange = (language: LanguageEnum) => {
     setTargetLanguage(language);
     getTranslatedText(sourceText, context);
-  };
-
-  const handleLearningModeChange = (value: boolean) => {
-    setLearningModeState(value);
   };
 
   // listen to the AI port for stream result from background
@@ -199,7 +193,7 @@ const Entry = () => {
       <AnimatePresence>
         {showEntryPanel && (
           <motion.div
-            className="fixed -translate-x-1/2 w-[400px] py-2 px-3 shadow-lg rounded-lg base-background base-border base-font"
+            className="-translate-x-1/2 base-background base-border base-font fixed w-[400px] rounded-lg px-3 py-2 shadow-lg"
             initial={{ opacity: 0, x: entryPanelPosition.x, y: entryPanelPosition.y }}
             animate={{ opacity: 1, x: entryPanelPosition.x, y: entryPanelPosition.y }}
             exit={{ opacity: 0 }}
@@ -247,29 +241,48 @@ const Entry = () => {
 
             <Separator className="my-3 bg-slate-300/70 dark:bg-slate-200/70" />
 
-            {textType === TextTypes.LONG_TEXT && <div className="min-h-6">{targetText}</div>}
-            {textType === TextTypes.SINGLE_WORD && (
+            {errorMessage && (
+              <div className="mb-2 flex items-center">
+                <Ban size={14} className="mr-2 text-red-600" />
+                <span className="text-red-600">{errorMessage}</span>
+              </div>
+            )}
+
+            {textType === TextTypes.LONG_TEXT && !errorMessage && <div className="min-h-6">{targetText}</div>}
+            {textType === TextTypes.SINGLE_WORD && !errorMessage && (
               <div className="min-h-6">
-                <div className="flex items-center mb-1">
-                  {targetWordData && <span className="mr-3 text-[18px] font-bold">{sourceText}</span>}
-                  {targetWordData?.pronunciation && <span className="mr-2 text-slate-600">[{targetWordData?.pronunciation}]</span>}
+                <div className="mb-1 flex items-center">
+                  {targetWordData && (
+                    <motion.span {...baseMotionProps} className="mr-3 font-bold text-[18px]">
+                      {sourceText}
+                    </motion.span>
+                  )}
+                  {targetWordData?.pronunciation && (
+                    <motion.span {...baseMotionProps} className="mr-2 text-slate-600">
+                      [{targetWordData?.pronunciation}]
+                    </motion.span>
+                  )}
                 </div>
-                <div className="flex text-gray-800 h-[12px] items-center">
+
+                <div className="flex h-[12px] items-center text-gray-800">
                   {join(targetWordData?.translation, ", ")}
                   {targetWordData?.partOfSpeech && targetWordData?.translation && <Separator className="mx-2 bg-slate-500/60" orientation="vertical" />}
-
-                  <span>{targetWordData?.partOfSpeech}</span>
+                  <motion.span {...baseMotionProps}>{targetWordData?.partOfSpeech}</motion.span>
                 </div>
 
-                {targetWordData?.examples && targetWordData.examples.length > 0 && <h4 className="mt-8 mb-1 font-semibold">Examples</h4>}
+                {targetWordData?.examples && targetWordData.examples.length > 0 && (
+                  <motion.h4 {...baseMotionProps} className="mt-8 mb-1 font-semibold">
+                    Examples
+                  </motion.h4>
+                )}
 
                 {map(targetWordData?.examples, (item) => (
-                  <ul className="mb-3 px-4 text-gray-800 list-disc" key={item.id}>
+                  <motion.ul {...baseMotionProps} className="mb-3 list-disc px-4 text-gray-800" key={item.id}>
                     <li>
                       <p className="leading-snug">{item.source}</p>
                       <p className="leading-snug">{item.target}</p>
                     </li>
-                  </ul>
+                  </motion.ul>
                 ))}
               </div>
             )}

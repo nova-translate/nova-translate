@@ -4,7 +4,7 @@ import { useStorage } from "@plasmohq/storage/hook";
 import { Input } from "@/components/ui/input";
 import { Label } from "@radix-ui/react-label";
 import { StorageKeys } from "@/config/storage";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Eye, EyeClosed } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { Separator } from "@/components/ui/separator";
@@ -40,19 +40,19 @@ function IndexPopup() {
   const ApiKeyEyeIcon = isApiKeyVisible ? <Eye size={16} onClick={handleApiKeyEyeClick} /> : <EyeClosed size={16} onClick={handleApiKeyEyeClick} />;
 
   return (
-    <div className="w-[450px] p-4 space-y-4">
+    <div className="w-[450px] space-y-4 p-4">
       <AnimatePresence>
         <motion.div
-          className="border shadow-lg rounded-md px-3 py-2"
+          className="rounded-md border px-3 py-2 shadow-md"
           initial={{ opacity: 0, transform: "translateY(10px)" }}
           whileInView={{ opacity: 1, transform: "translateY(0)" }}
         >
-          <h4 className="text-base font-medium mb-3">Basic Setting</h4>
+          <h4 className="my-2 font-medium">{chrome.i18n.getMessage("setting_basic_title")}</h4>
           <Separator className="my-2 bg-slate-300/70 dark:bg-slate-200/70" />
-          <div className="flex items-center mb-2 justify-between">
-            <Label className="flex-shrink-0 min-w-20 mr-2">Keyboard shortcut</Label>
+          <div className="mb-2 flex items-center justify-between">
+            <Label className="mr-2 min-w-20 flex-shrink-0">{chrome.i18n.getMessage("setting_basic_shortcut")}</Label>
             <Select value={shortcut} onValueChange={setShortcut}>
-              <SelectTrigger className="w-36 h-7 text-sm">
+              <SelectTrigger className="h-7 w-36 text-sm">
                 <SelectValue placeholder="Select a shortcut" />
               </SelectTrigger>
               <SelectContent className="w-36 text-sm">
@@ -68,24 +68,24 @@ function IndexPopup() {
         </motion.div>
 
         <motion.div
-          className="border shadow-lg rounded-md px-3 py-2"
+          className="rounded-md border px-3 py-2 shadow-md"
           initial={{ opacity: 0, transform: "translateY(10px)" }}
           whileInView={{ opacity: 1, transform: "translateY(0)" }}
         >
-          <h4 className="text-base font-medium">Model Provider</h4>
+          <h4 className="my-2 font-medium">{chrome.i18n.getMessage("setting_model_title")}</h4>
           <Separator className="my-2 bg-slate-300/70 dark:bg-slate-200/70" />
-          <div className="flex items-center mb-2 justify-between">
-            <Label className="flex-shrink-0 min-w-20 mr-2">Model ID</Label>
+          <div className="mb-2 flex items-center justify-between">
+            <Label className="mr-2 min-w-20 flex-shrink-0">{chrome.i18n.getMessage("setting_model_id")}</Label>
             <Input className="h-7 text-sm" value={modelId} onChange={handleModelIdChange} />
           </div>
           <Separator className="my-2 bg-slate-300/70 dark:bg-slate-200/70" />
-          <div className="flex items-center mb-2">
-            <Label className="flex-shrink-0 min-w-20 mr-2">API key</Label>
-            <Input className="h-7 text-sm pr-10" type={isApiKeyVisible ? "text" : "password"} value={apiKey} onChange={handleApiKeyChange} endIcon={ApiKeyEyeIcon} />
+          <div className="mb-2 flex items-center">
+            <Label className="mr-2 min-w-20 flex-shrink-0">{chrome.i18n.getMessage("setting_model_api_key")}</Label>
+            <Input className="h-7 pr-10 text-sm" type={isApiKeyVisible ? "text" : "password"} value={apiKey} onChange={handleApiKeyChange} endIcon={ApiKeyEyeIcon} />
           </div>
           <Separator className="my-2 bg-slate-300/70 dark:bg-slate-200/70" />
-          <div className="flex items-center mb-2">
-            <Label className="flex-shrink-0 min-w-20 mr-2">API URL</Label>
+          <div className="mb-2 flex items-center">
+            <Label className="mr-2 min-w-20 flex-shrink-0">{chrome.i18n.getMessage("setting_model_api_url")}</Label>
             <Input className="h-7 text-sm" value={apiUrl} onChange={handleApiUrlChange} />
           </div>
         </motion.div>
