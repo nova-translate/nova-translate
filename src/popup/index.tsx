@@ -4,7 +4,7 @@ import { useStorage } from "@plasmohq/storage/hook";
 import { Input } from "@/components/ui/input";
 import { Label } from "@radix-ui/react-label";
 import { StorageKeys } from "@/config/storage";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Eye, EyeClosed } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { Separator } from "@/components/ui/separator";
@@ -40,10 +40,10 @@ function IndexPopup() {
   const ApiKeyEyeIcon = isApiKeyVisible ? <Eye size={16} onClick={handleApiKeyEyeClick} /> : <EyeClosed size={16} onClick={handleApiKeyEyeClick} />;
 
   return (
-    <div className="w-[450px] space-y-4 p-4">
+    <div className="w-[400px] space-y-4 bg-gradient-to-br from-slate-400/75 via-slate-50 to-slate-600/90 p-4">
       <AnimatePresence>
         <motion.div
-          className="rounded-md border px-3 py-2 shadow-md"
+          className="rounded-md border bg-white px-3 py-2 shadow-md backdrop-blur-md"
           initial={{ opacity: 0, transform: "translateY(10px)" }}
           whileInView={{ opacity: 1, transform: "translateY(0)" }}
         >
@@ -57,7 +57,9 @@ function IndexPopup() {
               </SelectTrigger>
               <SelectContent className="w-36 text-sm">
                 <SelectGroup>
-                  <SelectItem value="ctrl+alt+n">Ctrl + Alt + N</SelectItem>
+                  <SelectItem className="text-sm" value="ctrl+alt+n">
+                    Ctrl + Alt + N
+                  </SelectItem>
                   <SelectItem value="ctrl+alt+t">Ctrl + Alt + T</SelectItem>
                 </SelectGroup>
               </SelectContent>
@@ -66,7 +68,7 @@ function IndexPopup() {
         </motion.div>
 
         <motion.div
-          className="rounded-md border px-3 py-2 shadow-md"
+          className="rounded-md border bg-white px-3 py-2 shadow-md backdrop-blur-md"
           initial={{ opacity: 0, transform: "translateY(10px)" }}
           whileInView={{ opacity: 1, transform: "translateY(0)" }}
         >

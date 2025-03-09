@@ -2,7 +2,7 @@ import { Space } from "lucide-react";
 
 export const MAX_TRANSLATION_LENGTH = 2000;
 export const PLASMO_CONTAINER_Z_INDEX = 2147483647;
-export const DEFAULT_SHORTCUT = "alt+n";
+export const DEFAULT_SHORTCUT = "ctrl+alt+n";
 
 export enum LanguageEnum {
   Chinese = "zh",
