@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, useDragControls } from "motion/react";
 import Mousetrap from "mousetrap";
 import { debounce, split, uniqueId, map, join } from "lodash-es";
-import { ArrowRight, Ban, Check, ChevronsUpDown } from "lucide-react";
+import { ArrowRight, Ban, Check, ChevronsUpDown, GripHorizontal, Pin, PinOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -17,6 +17,7 @@ import { DEFAULT_SHORTCUT, LanguageEnum, Languages, MAX_TRANSLATION_LENGTH, Text
 import cssText from "data-text:@/styles/contents.css";
 import type { SingleWordInfoType } from "@/background/ports/ai";
 import { baseMotionProps } from "@/config/motion";
+import { Toggle } from "@/components/ui/toggle";
 
 export const getStyle = () => {
   const style = document.createElement("style");
@@ -41,6 +42,14 @@ const Entry = () => {
     if (value === undefined) return LanguageEnum.English;
     return value;
   });
+  const [pinned, setPinned] = useStorage(StorageKeys.PINNED, false);
+
+  const dragControls = useDragControls();
+
+  function startDrag(event: React.PointerEvent) {
+    event.preventDefault();
+    dragControls.start(event, { snapToCursor: false });
+  }
 
   // bottom middle of the selected text
   const entryPanelPosition = useMemo(() => {
@@ -140,20 +149,23 @@ const Entry = () => {
       selectedText = selectedText.slice(0, MAX_TRANSLATION_LENGTH);
 
       setShowEntryPanel(true);
-      setSourceTextRect({ left, right, top, bottom });
       setSourceText(selectedText);
       getTranslatedText(selectedText, selectedTextContext);
+
+      // if not show panel before or not pinned, reset position
+      if (!pinned || !showEntryPanel) setSourceTextRect({ left, right, top, bottom });
     });
 
     return () => {
       Mousetrap.unbind(shortcut);
     };
-  }, [shortcut]);
+  }, [shortcut, pinned, showEntryPanel]);
 
   // update entry panel position when scrolling the page
   useEffect(() => {
     const handleScroll = debounce(() => {
       if (!showEntryPanel) return;
+      if (pinned) return;
 
       const selection = window.getSelection();
       if (!selection) return;
@@ -172,7 +184,7 @@ const Entry = () => {
 
     document.addEventListener("scroll", handleScroll);
     return () => document.removeEventListener("scroll", handleScroll);
-  }, [showEntryPanel]);
+  }, [showEntryPanel, pinned]);
 
   // hide entry panel when click outside
   useEffect(() => {
@@ -180,6 +192,7 @@ const Entry = () => {
       // do not hide if click on the extension element
       const target = event.target as HTMLElement;
       if (target.localName === "plasmo-csui") return;
+      if (pinned) return;
 
       setShowEntryPanel(false);
       setSourceTextRect({ left: 0, right: 0, top: 0, bottom: 0 });
@@ -187,58 +200,77 @@ const Entry = () => {
 
     document.addEventListener("mousedown", handleMouseDown);
     return () => document.removeEventListener("mousedown", handleMouseDown);
-  }, []);
+  }, [pinned]);
 
   return (
     <>
       <AnimatePresence>
         {showEntryPanel && (
           <motion.div
-            className="-translate-x-1/2 base-background base-border base-font fixed w-[400px] rounded-lg px-3 py-2 text-sm shadow-lg"
-            initial={{ opacity: 0, x: entryPanelPosition.x, y: entryPanelPosition.y }}
-            animate={{ opacity: 1, x: entryPanelPosition.x, y: entryPanelPosition.y }}
+            className="-translate-x-1/2 base-background base-border base-font fixed w-[400px] rounded-lg px-3 pt-4 pb-3 text-sm shadow-lg"
+            initial={{ opacity: 0, x: entryPanelPosition.x, y: entryPanelPosition.y + 10 }}
+            whileInView={{ opacity: 1, x: entryPanelPosition.x, y: entryPanelPosition.y }}
             exit={{ opacity: 0 }}
+            drag
+            dragListener={false}
+            dragMomentum={false}
+            dragControls={dragControls}
           >
+            <div
+              className="absolute top-0 right-0 left-0 mx-auto flex w-1/6 transform cursor-move justify-center text-slate-500/70 transition-colors hover:text-slate-500"
+              onPointerDown={startDrag}
+            >
+              <GripHorizontal size={14} />
+            </div>
+
             <div className="flex items-center justify-between">
-              <Button disabled variant="outline" size={"sm"} className={cn("w-40 justify-between", !targetLanguage && "text-muted-foreground")}>
-                <div className="overflow-hidden overflow-ellipsis text-left">{chrome.i18n.getMessage("entry_panel_source_language")}</div>
-                <ChevronsUpDown className="opacity-50" />
-              </Button>
+              <div className="flex items-center justify-between">
+                <Button disabled variant="outline" size={"sm"} className={cn("w-36 justify-between", !targetLanguage && "text-muted-foreground")}>
+                  <div className="overflow-hidden overflow-ellipsis text-left">{chrome.i18n.getMessage("entry_panel_source_language")}</div>
+                  <ChevronsUpDown className="opacity-50" />
+                </Button>
 
-              <ArrowRight size={20} className="mx-2" />
+                <ArrowRight size={20} className="mx-2" />
 
-              <Popover open={languageOptionsOpen} onOpenChange={setLanguageOptionsOpen}>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" size={"sm"} className={cn("w-40 justify-between", !targetLanguage && "text-muted-foreground")}>
-                    <div className="overflow-hidden overflow-ellipsis text-left">{Languages.find((language) => language.value === targetLanguage)?.label}</div>
-                    <ChevronsUpDown className="opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-40 p-0">
-                  <Command>
-                    <CommandList>
-                      <CommandEmpty>No language found.</CommandEmpty>
-                      <CommandGroup>
-                        {Languages.map((language) => (
-                          <CommandItem
-                            value={language.label}
-                            key={language.value}
-                            onSelect={() => {
-                              handleTargetLanguageChange(language.value);
-                              setLanguageOptionsOpen(false);
-                            }}
-                          >
-                            <div className="overflow-hidden overflow-ellipsis text-nowrap text-xs" title={language.label}>
-                              {language.label}
-                            </div>
-                            <Check className={cn("ml-auto", language.value === targetLanguage ? "opacity-100" : "opacity-0")} />
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
+                <Popover open={languageOptionsOpen} onOpenChange={setLanguageOptionsOpen}>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" size={"sm"} className={cn("w-36 justify-between", !targetLanguage && "text-muted-foreground")}>
+                      <div className="overflow-hidden overflow-ellipsis text-left">{Languages.find((language) => language.value === targetLanguage)?.label}</div>
+                      <ChevronsUpDown className="opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-36 p-0">
+                    <Command>
+                      <CommandList>
+                        <CommandEmpty>No language found.</CommandEmpty>
+                        <CommandGroup>
+                          {Languages.map((language) => (
+                            <CommandItem
+                              value={language.label}
+                              key={language.value}
+                              onSelect={() => {
+                                handleTargetLanguageChange(language.value);
+                                setLanguageOptionsOpen(false);
+                              }}
+                            >
+                              <div className="overflow-hidden overflow-ellipsis text-nowrap text-xs" title={language.label}>
+                                {language.label}
+                              </div>
+                              <Check className={cn("ml-auto", language.value === targetLanguage ? "opacity-100" : "opacity-0")} />
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              <div>
+                <Toggle size={"sm"} pressed={pinned} onPressedChange={setPinned}>
+                  {pinned ? <Pin /> : <PinOff />}
+                </Toggle>
+              </div>
             </div>
 
             <Separator className="my-3 bg-slate-300/70 dark:bg-slate-200/70" />
