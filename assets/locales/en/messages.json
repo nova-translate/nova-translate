@@ -34,5 +34,8 @@
   },
   "entry_panel_target_language_russian": {
     "message": "Russian"
+  },
+  "entry_panel_content_title_examples": {
+    "message": "Examples"
   }
 }

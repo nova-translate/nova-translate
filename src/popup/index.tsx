@@ -40,10 +40,10 @@ function IndexPopup() {
   const ApiKeyEyeIcon = isApiKeyVisible ? <Eye size={16} onClick={handleApiKeyEyeClick} /> : <EyeClosed size={16} onClick={handleApiKeyEyeClick} />;
 
   return (
-    <div className="w-[400px] space-y-4 bg-gradient-to-br from-slate-400/75 via-slate-50 to-slate-600/90 p-4">
+    <div className="w-[400px] space-y-4 bg-gradient-to-br from-slate-100/60 to-slate-400/70 p-4">
       <AnimatePresence>
         <motion.div
-          className="rounded-md border bg-white px-3 py-2 shadow-md backdrop-blur-md"
+          className="rounded-md border bg-white px-3 py-2 shadow-md"
           initial={{ opacity: 0, transform: "translateY(10px)" }}
           whileInView={{ opacity: 1, transform: "translateY(0)" }}
         >
@@ -68,7 +68,7 @@ function IndexPopup() {
         </motion.div>
 
         <motion.div
-          className="rounded-md border bg-white px-3 py-2 shadow-md backdrop-blur-md"
+          className="rounded-md border bg-white px-3 py-2 shadow-md"
           initial={{ opacity: 0, transform: "translateY(10px)" }}
           whileInView={{ opacity: 1, transform: "translateY(0)" }}
         >

@@ -42,7 +42,7 @@ const Entry = () => {
     if (value === undefined) return LanguageEnum.English;
     return value;
   });
-  const [pinned, setPinned] = useStorage(StorageKeys.PINNED, false);
+  const [pinned, setPinned] = useState(false);
 
   const dragControls = useDragControls();
 
@@ -217,7 +217,7 @@ const Entry = () => {
             dragControls={dragControls}
           >
             <div
-              className="absolute top-0 right-0 left-0 mx-auto flex w-1/6 transform cursor-move justify-center text-slate-500/70 transition-colors hover:text-slate-500"
+              className="absolute top-0 right-0 left-0 mx-auto flex w-1/6 transform cursor-move justify-center text-slate-500/70 transition-colors hover:text-slate-950"
               onPointerDown={startDrag}
             >
               <GripHorizontal size={14} />
@@ -292,7 +292,7 @@ const Entry = () => {
                     </motion.span>
                   )}
                   {targetWordData?.pronunciation && (
-                    <motion.span {...baseMotionProps} className="mr-2">
+                    <motion.span {...baseMotionProps} className="mr-2 text-gray-800">
                       [{targetWordData?.pronunciation}]
                     </motion.span>
                   )}
@@ -306,7 +306,7 @@ const Entry = () => {
 
                 {targetWordData?.examples && targetWordData.examples.length > 0 && (
                   <motion.h4 {...baseMotionProps} className="mt-8 mb-1 font-semibold">
-                    Examples
+                    {chrome.i18n.getMessage("entry_panel_content_title_examples")}
                   </motion.h4>
                 )}
 

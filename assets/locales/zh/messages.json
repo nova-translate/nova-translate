@@ -34,5 +34,8 @@
   },
   "entry_panel_target_language_russian": {
     "message": "俄语"
+  },
+  "entry_panel_content_title_examples": {
+    "message": "示例"
   }
 }
