@@ -40,7 +40,7 @@ function IndexPopup() {
   const ApiKeyEyeIcon = isApiKeyVisible ? <Eye size={16} onClick={handleApiKeyEyeClick} /> : <EyeClosed size={16} onClick={handleApiKeyEyeClick} />;
 
   return (
-    <div className="w-[400px] space-y-4 bg-gradient-to-br from-slate-100/60 to-slate-400/70 p-4">
+    <div className="w-[400px] space-y-4 bg-gradient-to-tr from-sky-100/90 to-indigo-100/90 p-4">
       <AnimatePresence>
         <motion.div
           className="rounded-md border bg-white px-3 py-2 shadow-md"
