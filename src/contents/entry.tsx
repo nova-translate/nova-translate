@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion, useDragControls } from "motion/react";
 import Mousetrap from "mousetrap";
-import { debounce, split, uniqueId, map, join } from "lodash-es";
-import { ArrowRight, Ban, Check, ChevronsUpDown, GripHorizontal, Pin, PinOff } from "lucide-react";
+import { debounce, uniqueId, map, join } from "lodash-es";
+import { ArrowRight, Ban, Check, ChevronsUpDown, GripHorizontal, LoaderCircle, Pin, PinOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -11,7 +11,7 @@ import { useStorage } from "@plasmohq/storage/hook";
 import { usePort } from "@plasmohq/messaging/hook";
 import { StorageKeys } from "@/config/storage";
 import { MessageTypes } from "@/config/message";
-import { checkTextType, cn } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { DEFAULT_SHORTCUT, LanguageEnum, Languages, MAX_TRANSLATION_LENGTH, TextTypes } from "@/config/common";
 
 import cssText from "data-text:@/styles/contents.css";
@@ -27,10 +27,11 @@ export const getStyle = () => {
 
 const Entry = () => {
   const aiPort = usePort("ai");
+  const [loading, setLoading] = useState(false);
   const [context, setContext] = useState("");
   const [sourceText, setSourceText] = useState("");
   const [textId, setTextId] = useState("");
-  const [textType, setTextType] = useState("");
+  const [textType, setTextType] = useState<TextTypes>();
   const [targetText, setTargetText] = useState("");
   const [targetWordData, setTargetWordData] = useState<SingleWordInfoType>();
   const [errorMessage, setErrorMessage] = useState("");
@@ -61,17 +62,16 @@ const Entry = () => {
 
   const getTranslatedText = async (selectedText: string, selectedTextContext: string) => {
     const id = uniqueId();
-    const textType = await checkTextType(selectedText);
 
     setTextId(id);
-    setTextType(textType);
     setTargetText("");
     setErrorMessage("");
+    setTextType(undefined);
     setTargetWordData(undefined);
+    setLoading(true);
 
     aiPort.send({
       uniqueId: id,
-      textType,
       text: selectedText,
       context: selectedTextContext
     });
@@ -90,18 +90,24 @@ const Entry = () => {
       const { messageType, data } = message;
 
       if (messageType === MessageTypes.TRANSLATE_TEXT_PART) {
-        const { uniqueId, textType, text, wordData } = data;
-        if (uniqueId !== textId) return;
+        const { uniqueId, textType: newTextType, text, wordData } = data;
 
-        if (textType === TextTypes.SINGLE_WORD) {
+        if (uniqueId !== textId) return;
+        if (!textType) setTextType(newTextType);
+
+        if (newTextType === TextTypes.SINGLE_WORD) {
           setTargetWordData(wordData);
         }
 
-        if (textType === TextTypes.LONG_TEXT) {
+        if (newTextType === TextTypes.LONG_TEXT) {
           setTargetText((prev) => {
             return prev + text;
           });
         }
+      }
+
+      if (messageType === MessageTypes.TRANSLATE_TEXT_FINISH) {
+        setLoading(false);
       }
 
       if (messageType === MessageTypes.TRANSLATE_TEXT_ERROR) {
@@ -275,51 +281,61 @@ const Entry = () => {
 
             <Separator className="my-3 bg-slate-300/70 dark:bg-slate-200/70" />
 
-            {errorMessage && (
-              <div className="mb-2 flex items-center">
-                <Ban size={14} className="mr-2 text-red-600" />
-                <span className="text-red-600">{errorMessage}</span>
-              </div>
-            )}
-
-            {textType === TextTypes.LONG_TEXT && !errorMessage && <div className="min-h-6">{targetText}</div>}
-            {textType === TextTypes.SINGLE_WORD && !errorMessage && (
-              <div className="min-h-6">
-                <div className="mb-1 flex items-center">
-                  {targetWordData && (
-                    <motion.span {...baseMotionProps} className="mr-3 font-bold text-lg">
-                      {sourceText}
-                    </motion.span>
-                  )}
-                  {targetWordData?.pronunciation && (
-                    <motion.span {...baseMotionProps} className="mr-2 text-gray-800">
-                      [{targetWordData?.pronunciation}]
-                    </motion.span>
-                  )}
-                </div>
-
-                <div className="flex h-3 items-center text-gray-800">
-                  {join(targetWordData?.translation, ", ")}
-                  {targetWordData?.partOfSpeech && targetWordData?.translation && <Separator className="mx-2 bg-slate-500/60" orientation="vertical" />}
-                  <motion.span {...baseMotionProps}>{targetWordData?.partOfSpeech}</motion.span>
-                </div>
-
-                {targetWordData?.examples && targetWordData.examples.length > 0 && (
-                  <motion.h4 {...baseMotionProps} className="mt-8 mb-1 font-semibold">
-                    {chrome.i18n.getMessage("entry_panel_content_title_examples")}
-                  </motion.h4>
+            <div className="relative min-h-8">
+              <AnimatePresence>
+                {loading && textType !== TextTypes.LONG_TEXT && (
+                  <motion.div whileInView={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                    <LoaderCircle size={18} className="absolute top-1 right-0 animate-spin text-slate-600" />
+                  </motion.div>
                 )}
+              </AnimatePresence>
 
-                {map(targetWordData?.examples, (item) => (
-                  <motion.ul {...baseMotionProps} className="mb-3 list-disc px-4 text-gray-800" key={item.id}>
-                    <li>
-                      <p className="leading-snug">{item.source}</p>
-                      <p className="leading-snug">{item.target}</p>
-                    </li>
-                  </motion.ul>
-                ))}
-              </div>
-            )}
+              {errorMessage && (
+                <div className="mb-2 flex items-center">
+                  <Ban size={14} className="mr-2 text-red-600" />
+                  <span className="text-red-600">{errorMessage}</span>
+                </div>
+              )}
+
+              {textType === TextTypes.LONG_TEXT && !errorMessage && <div className="min-h-6">{targetText}</div>}
+              {textType === TextTypes.SINGLE_WORD && !errorMessage && (
+                <div className="min-h-6">
+                  <div className="mb-1 flex items-center">
+                    {targetWordData && (
+                      <motion.span {...baseMotionProps} className="mr-3 font-bold text-lg">
+                        {sourceText}
+                      </motion.span>
+                    )}
+                    {targetWordData?.pronunciation && (
+                      <motion.span {...baseMotionProps} className="mr-2 text-gray-800">
+                        [{targetWordData?.pronunciation}]
+                      </motion.span>
+                    )}
+                  </div>
+
+                  <div className="flex h-3 items-center text-gray-800">
+                    {join(targetWordData?.translation, ", ")}
+                    {targetWordData?.partOfSpeech && targetWordData?.translation && <Separator className="mx-2 bg-slate-500/60" orientation="vertical" />}
+                    <motion.span {...baseMotionProps}>{targetWordData?.partOfSpeech}</motion.span>
+                  </div>
+
+                  {targetWordData?.examples && targetWordData.examples.length > 0 && (
+                    <motion.h4 {...baseMotionProps} className="mt-8 mb-1 font-semibold">
+                      {chrome.i18n.getMessage("entry_panel_content_title_examples")}
+                    </motion.h4>
+                  )}
+
+                  {map(targetWordData?.examples, (item) => (
+                    <motion.ul {...baseMotionProps} className="mb-3 list-disc px-4 text-gray-800" key={item.id}>
+                      <li>
+                        <p className="leading-snug">{item.source}</p>
+                        <p className="leading-snug">{item.target}</p>
+                      </li>
+                    </motion.ul>
+                  ))}
+                </div>
+              )}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

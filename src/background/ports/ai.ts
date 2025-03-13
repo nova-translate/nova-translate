@@ -1,6 +1,6 @@
 import { Storage } from "@plasmohq/storage";
 import type { PlasmoMessaging } from "@plasmohq/messaging";
-import { streamObject, streamText } from "ai";
+import { generateObject, generateText, streamObject, streamText } from "ai";
 import { StorageKeys } from "@/config/storage";
 import { createOpenAI, type OpenAIProvider } from "@ai-sdk/openai";
 import { MessageTypes } from "@/config/message";
@@ -27,6 +27,11 @@ storage.watch({
   }
 });
 
+const InputTextTypeSchema = z.object({
+  textType: z.enum([TextTypes.LONG_TEXT, TextTypes.SINGLE_WORD]),
+  languageTag: z.string()
+});
+
 const SingleWordInfoSchema = z.object({
   pronunciation: z.string(),
   partOfSpeech: z.string(),
@@ -37,9 +42,33 @@ const SingleWordInfoSchema = z.object({
 export type SingleWordInfoType = z.infer<typeof SingleWordInfoSchema>;
 
 const handler: PlasmoMessaging.PortHandler = async (req, res) => {
-  const { uniqueId, textType, text: sourceText, context } = req.body as { uniqueId: string; textType: TextTypes; text: string; context: string };
+  const { uniqueId, text: sourceText, context } = req.body as { uniqueId: string; text: string; context: string };
   const modelId = await storage.get(StorageKeys.MODEL_ID);
   const targetLanguage = await storage.get(StorageKeys.TARGET_LANGUAGE);
+
+  const { object } = await generateObject({
+    model: openAIProvider(modelId),
+    system: SYSTEM_PROMPT,
+    schema: InputTextTypeSchema,
+    prompt: `
+    # Goals
+    1. Detect the language of the input text;
+    2. Determine if it is a single word or long text;
+
+    # Specific Requirements
+    1. Based on the context;
+    2. Provide language tag, such as "en", "zh-CN", "ja", etc.;
+    3. Provide text type, such as "${TextTypes.SINGLE_WORD}" or "${TextTypes.LONG_TEXT}";
+
+    ## Context
+    The context is: [${context}];
+
+    ## Input
+    The input text is: [${sourceText}];
+    `
+  });
+
+  const { textType } = object;
 
   if (textType === TextTypes.LONG_TEXT) {
     const result = streamText({
@@ -81,6 +110,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
     const result = streamObject({
       model: openAIProvider(modelId),
       system: SYSTEM_PROMPT,
+      schema: SingleWordInfoSchema,
       prompt: `Your goal is to translate words from any language into [${targetLanguage}].
       Here are the specific requirements:
       1. Provide word translation;
@@ -90,7 +120,6 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
       5. If the provided language and the target language are the same, return it as is;
       6. The result should be consistent with the context, the context is: [${context}];
       Please translate the following word: [${sourceText}]`,
-      schema: SingleWordInfoSchema,
       onFinish({ object }) {
         if (object === undefined) return;
 

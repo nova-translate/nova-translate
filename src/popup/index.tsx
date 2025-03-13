@@ -61,6 +61,7 @@ function IndexPopup() {
                     Ctrl + Alt + N
                   </SelectItem>
                   <SelectItem value="ctrl+alt+t">Ctrl + Alt + T</SelectItem>
+                  <SelectItem value="ctrl+alt+z">Ctrl + Alt + Z</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>
