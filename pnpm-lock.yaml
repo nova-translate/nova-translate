@@ -89,9 +89,6 @@ importers:
       tailwindcss-animate:
         specifier: 1.0.7
         version: 1.0.7(tailwindcss@3.4.17)
-      tiny-segmenter:
-        specifier: ^0.2.0
-        version: 0.2.0
       zod:
         specifier: 3.24.2
         version: 3.24.2
@@ -4400,9 +4397,6 @@ packages:
 
   timsort@0.3.0:
     resolution: {integrity: sha512-qsdtZH+vMoCARQtyod4imc2nIJwg9Cc7lPRrw9CzF8ZKR0khdr8+2nX80PBhET3tcyTtJDxAffGh2rXH4tyU8A==}
-
-  tiny-segmenter@0.2.0:
-    resolution: {integrity: sha512-m+aTJQ/CUBKurLaJRpLmJiwcL+Gpkzft5ZYnRU9AkuO45Y/k/2iJmuLEbN1XLrq6N3kDVyIUCCeqRzQx0feBag==}
 
   tmp@0.0.33:
     resolution: {integrity: sha512-jRCJlojKnZ3addtTOjdIqoRuPEKBvNXcGYqzO6zWZX8KfKEpnGY5jfggJQ3EjKuu8D4bJRr0y+cYJFmYbImXGw==}
@@ -9112,8 +9106,6 @@ snapshots:
   throttleit@2.1.0: {}
 
   timsort@0.3.0: {}
-
-  tiny-segmenter@0.2.0: {}
 
   tmp@0.0.33:
     dependencies:

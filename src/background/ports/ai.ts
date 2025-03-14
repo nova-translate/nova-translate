@@ -60,12 +60,11 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
     2. Provide language tag, such as "en", "zh-CN", "ja", etc.;
     3. Provide text type, such as "${TextTypes.SINGLE_WORD}" or "${TextTypes.LONG_TEXT}";
 
-    ## Context
+    # Context
     The context is: [${context}];
 
-    ## Input
-    The input text is: [${sourceText}];
-    `
+    # Input
+    The input text is: [${sourceText}];`
   });
 
   const { textType } = object;
@@ -74,14 +73,19 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
     const result = streamText({
       model: openAIProvider(modelId),
       system: SYSTEM_PROMPT,
-      prompt: `Your goal is to translate any language into [${targetLanguage}].
-      Here are the specific requirements:
+      prompt: `
+      # Goals
+      Translate the input sentence from any language into [${targetLanguage}].
+
+      # Specific Requirements
       1. Translate naturally, fluently, and idiomatically while maintaining the highest degree of literal accuracy;
       2. Retain the original form of professional terms;
       3. Do not explain the translation result;
       4. Use spaces reasonably to make the result more readable, for example, by separating Chinese and English with spaces;
       5. If the provided language and the target language are the same, return it as is;
-      Please translate the following sentence: ${sourceText}`,
+
+      # Input
+      The input text is: [${sourceText}];`,
       onFinish({ finishReason }) {
         res.send({
           messageType: MessageTypes.TRANSLATE_TEXT_FINISH,
@@ -111,15 +115,23 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
       model: openAIProvider(modelId),
       system: SYSTEM_PROMPT,
       schema: SingleWordInfoSchema,
-      prompt: `Your goal is to translate words from any language into [${targetLanguage}].
-      Here are the specific requirements:
+      prompt: `
+      # Goals
+      Translate the input word from any language into [${targetLanguage}].
+
+      # Specific Requirements
       1. Provide word translation;
       2. If the source language has pronunciation (such as phonetic symbols, pinyin, etc.), please provide it;
       3. Provide part of speech (using the source language);
       4. Provide 3 sentence examples;
       5. If the provided language and the target language are the same, return it as is;
-      6. The result should be consistent with the context, the context is: [${context}];
-      Please translate the following word: [${sourceText}]`,
+      6. The result should be consistent with the context;
+
+      # Context
+      The context is: [${context}];
+
+      # Input
+      The input text is: [${sourceText}];`,
       onFinish({ object }) {
         if (object === undefined) return;
 
