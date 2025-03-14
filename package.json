@@ -2,7 +2,7 @@
   "name": "nova-translate",
   "displayName": "Nova Translate",
   "version": "0.0.1",
-  "description": "An AI LLM-based translator tool, supporting long text translation and single word translation",
+  "description": "A fully AI-driven translate extension that helps you understand foreign languages effortlessly. ",
   "author": "lucas.liuchao@gmail.com",
   "scripts": {
     "dev": "plasmo dev",
@@ -60,10 +60,16 @@
     "typescript": "5.2.2"
   },
   "manifest": {
-    "host_permissions": [
-      "https://*/*"
+    "default_locale": "en",
+    "permissions": [
+      "activeTab",
+      "scripting",
+      "storage"
     ],
-    "default_locale": "en"
+    "host_permissions": [
+      "http://*/*",
+      "https://*/*"
+    ]
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,mjs,css}": [

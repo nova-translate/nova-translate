@@ -53,7 +53,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
     prompt: `
     # Goals
     1. Detect the language of the input text;
-    2. Determine if it is a single word or long text;
+    2. Determine if it is a word or long text;
 
     # Specific Requirements
     1. Based on the context;
@@ -61,10 +61,10 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
     3. Provide text type, such as "${TextTypes.SINGLE_WORD}" or "${TextTypes.LONG_TEXT}";
 
     # Context
-    The context is: [${context}];
+    ${context}
 
     # Input
-    The input text is: [${sourceText}];`
+    ${sourceText}`
   });
 
   const { textType } = object;
@@ -85,7 +85,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
       5. If the provided language and the target language are the same, return it as is;
 
       # Input
-      The input text is: [${sourceText}];`,
+      ${sourceText}`,
       onFinish({ finishReason }) {
         res.send({
           messageType: MessageTypes.TRANSLATE_TEXT_FINISH,
@@ -128,10 +128,10 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
       6. The result should be consistent with the context;
 
       # Context
-      The context is: [${context}];
+      ${context}
 
       # Input
-      The input text is: [${sourceText}];`,
+      ${sourceText}`,
       onFinish({ object }) {
         if (object === undefined) return;
 
