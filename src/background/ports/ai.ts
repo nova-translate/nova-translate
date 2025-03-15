@@ -60,6 +60,15 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
     2. Provide language tag, such as "en", "zh-CN", "ja", etc.;
     3. Provide text type, such as "${TextTypes.SINGLE_WORD}" or "${TextTypes.LONG_TEXT}";
 
+    # Examples
+    = "你“ -> { textType: "${TextTypes.SINGLE_WORD}", languageTag: "zh-CN" }
+    - "你好" -> { textType: "${TextTypes.SINGLE_WORD}", languageTag: "zh-CN" }
+    - "你好吗" -> { textType: "${TextTypes.LONG_TEXT}", languageTag: "zh-CN" }
+    - "hello" -> { textType: "${TextTypes.SINGLE_WORD}", languageTag: "en" }
+    - "how are you" -> { textType: "${TextTypes.LONG_TEXT}", languageTag: "en" }
+    - "こんにちは" -> { textType: "${TextTypes.SINGLE_WORD}", languageTag: "ja" }
+    - "お元気ですか" -> { textType: "${TextTypes.LONG_TEXT}", languageTag: "ja" }
+
     # Context
     ${context}
 

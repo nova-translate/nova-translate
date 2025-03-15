@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion, useDragControls } from "motion/react";
 import Mousetrap from "mousetrap";
 import { debounce, uniqueId, map, join } from "lodash-es";
-import { ArrowRight, Ban, Check, ChevronsUpDown, GripHorizontal, LoaderCircle, Pin, PinOff } from "lucide-react";
+import { ArrowRight, Ban, Check, ChevronsUpDown, GripHorizontal, LoaderCircle, Pin, PinOff, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -29,14 +29,15 @@ const Entry = () => {
   const aiPort = usePort("ai");
   const [loading, setLoading] = useState(false);
   const [context, setContext] = useState("");
-  const [sourceText, setSourceText] = useState("");
+  const [selectedText, setSelectedText] = useState("");
+  const [selectedTextRect, setSelectedTextRect] = useState({ left: 0, right: 0, top: 0, bottom: 0 });
   const [textId, setTextId] = useState("");
   const [textType, setTextType] = useState<TextTypes>();
   const [targetText, setTargetText] = useState("");
   const [targetWordData, setTargetWordData] = useState<SingleWordInfoType>();
   const [errorMessage, setErrorMessage] = useState("");
+  const [showEntryIcon, setShowEntryIcon] = useState(false);
   const [showEntryPanel, setShowEntryPanel] = useState(false);
-  const [sourceTextRect, setSourceTextRect] = useState({ left: 0, right: 0, top: 0, bottom: 0 });
   const [languageOptionsOpen, setLanguageOptionsOpen] = useState(false);
   const [shortcut] = useStorage<string>(StorageKeys.SHORTCUT, DEFAULT_SHORTCUT);
   const [targetLanguage, setTargetLanguage] = useStorage(StorageKeys.TARGET_LANGUAGE, (value) => {
@@ -53,12 +54,46 @@ const Entry = () => {
   }
 
   // bottom middle of the selected text
+  const entryIconPosition = useMemo(() => {
+    return {
+      x: selectedTextRect.left + (selectedTextRect.right - selectedTextRect.left) / 2 - 17,
+      y: selectedTextRect.bottom + 10
+    };
+  }, [selectedTextRect.left, selectedTextRect.right, selectedTextRect.bottom]);
+
+  // bottom middle of the selected text
   const entryPanelPosition = useMemo(() => {
     return {
-      x: sourceTextRect.left + (sourceTextRect.right - sourceTextRect.left) / 2 - 200,
-      y: sourceTextRect.bottom + 10
+      x: selectedTextRect.left + (selectedTextRect.right - selectedTextRect.left) / 2 - 200,
+      y: selectedTextRect.bottom + 10
     };
-  }, [sourceTextRect.left, sourceTextRect.right, sourceTextRect.bottom]);
+  }, [selectedTextRect.left, selectedTextRect.right, selectedTextRect.bottom]);
+
+  const getSelectedTextInfo = () => {
+    const selection = window.getSelection();
+    if (!selection) return;
+
+    const { isCollapsed } = selection;
+    if (isCollapsed) return;
+
+    const range = selection.getRangeAt(0);
+    const selectedTextRect = range.getBoundingClientRect();
+
+    let selectedText = selection.toString().trim();
+    selectedText = selectedText.slice(0, MAX_TRANSLATION_LENGTH);
+
+    let selectedTextContext = "";
+    const ContentLength = 100;
+    const startNode = range.startContainer;
+    if (startNode.nodeType === Node.TEXT_NODE) {
+      const fullText = startNode.textContent || "";
+      const startOffset = Math.max(range.startOffset - ContentLength, 0);
+      const endOffset = Math.min(range.endOffset + ContentLength, fullText.length);
+      selectedTextContext = fullText.slice(startOffset, endOffset);
+    }
+
+    return { selectedText, selectedTextContext, selectedTextRect };
+  };
 
   const getTranslatedText = async (selectedText: string, selectedTextContext: string) => {
     const id = uniqueId();
@@ -77,14 +112,23 @@ const Entry = () => {
     });
   };
 
+  const handleEntryIconClick = () => {
+    if (!selectedText) return;
+
+    setShowEntryIcon(false);
+    setShowEntryPanel(true);
+    getTranslatedText(selectedText, context);
+  };
+
   const handleTargetLanguageChange = (language: LanguageEnum) => {
     if (language === targetLanguage) return;
     setTargetLanguage(language);
-    getTranslatedText(sourceText, context);
+    getTranslatedText(selectedText, context);
   };
 
   // listen to the AI port for stream result from background
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  // biome-ignore lint/correctness/useExhaustiveDependencies(aiPort.listen): <explanation>
+  // biome-ignore lint/correctness/useExhaustiveDependencies(textType): <explanation>
   useEffect(() => {
     const listener = aiPort.listen((message) => {
       const { messageType, data } = message;
@@ -120,79 +164,72 @@ const Entry = () => {
     return () => listener.disconnect();
   }, [textId]);
 
-  // get text from selection and show entry panel
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  // show entry panel and hide icon when shortcut is pressed
+  // biome-ignore lint/correctness/useExhaustiveDependencies(getTranslatedText): <explanation>
   useEffect(() => {
     Mousetrap.bind(shortcut, () => {
-      const selection = window.getSelection();
-      if (!selection) return;
+      if (!selectedText) return;
 
-      const { isCollapsed } = selection;
-
-      // no text selected
-      if (isCollapsed) {
-        setShowEntryPanel(false);
-        return;
-      }
-
-      const range = selection.getRangeAt(0);
-      const rect = range.getBoundingClientRect();
-      const { left, right, top, bottom } = rect;
-
-      let selectedTextContext = "";
-      const ContentLength = 100;
-      const startNode = range.startContainer;
-
-      if (startNode.nodeType === Node.TEXT_NODE) {
-        const fullText = startNode.textContent || "";
-        const startOffset = Math.max(range.startOffset - ContentLength, 0);
-        const endOffset = Math.min(range.endOffset + ContentLength, fullText.length);
-        selectedTextContext = fullText.slice(startOffset, endOffset);
-        setContext(selectedTextContext);
-      }
-
-      let selectedText = selection.toString().trim();
-      selectedText = selectedText.slice(0, MAX_TRANSLATION_LENGTH);
-
+      setShowEntryIcon(false);
       setShowEntryPanel(true);
-      setSourceText(selectedText);
-      getTranslatedText(selectedText, selectedTextContext);
-
-      // if not show panel before or not pinned, reset position
-      if (!pinned || !showEntryPanel) setSourceTextRect({ left, right, top, bottom });
+      getTranslatedText(selectedText, context);
     });
 
     return () => {
       Mousetrap.unbind(shortcut);
     };
-  }, [shortcut, pinned, showEntryPanel]);
+  }, [shortcut, context, selectedText]);
+
+  // show entry icon when selected text
+  // if panel is open, just get translated text
+  // biome-ignore lint/correctness/useExhaustiveDependencies(getSelectedTextInfo): <explanation>
+  // biome-ignore lint/correctness/useExhaustiveDependencies(getTranslatedText): <explanation>
+  useEffect(() => {
+    const handleMouseUp = (event: MouseEvent) => {
+      const selectedTextInfo = getSelectedTextInfo();
+
+      if (!selectedTextInfo) {
+        setShowEntryIcon(false);
+        return;
+      }
+
+      setSelectedText(selectedTextInfo.selectedText);
+      setContext(selectedTextInfo.selectedTextContext);
+
+      const target = event.target as HTMLElement;
+      if (showEntryPanel && target.localName !== "plasmo-csui") {
+        getTranslatedText(selectedTextInfo.selectedText, selectedTextInfo.selectedTextContext);
+      }
+
+      if (!showEntryPanel) {
+        setShowEntryIcon(true);
+        setSelectedTextRect(selectedTextInfo.selectedTextRect);
+      }
+    };
+
+    document.addEventListener("mouseup", handleMouseUp);
+    return () => document.removeEventListener("mouseup", handleMouseUp);
+  }, [showEntryPanel]);
 
   // update entry panel position when scrolling the page
+  // biome-ignore lint/correctness/useExhaustiveDependencies(getSelectedTextInfo): <explanation>
   useEffect(() => {
     const handleScroll = debounce(() => {
       if (!showEntryPanel) return;
       if (pinned) return;
 
-      const selection = window.getSelection();
-      if (!selection) return;
+      const selectedTextInfo = getSelectedTextInfo();
+      if (!selectedTextInfo) return;
 
-      const { isCollapsed } = selection;
-
-      // no text selected
-      if (isCollapsed) return;
-
-      const range = selection.getRangeAt(0);
-      const rect = range.getBoundingClientRect();
-      const { left, right, top, bottom } = rect;
-
-      setSourceTextRect({ left, right, top, bottom });
+      const { left, right, top, bottom } = selectedTextInfo.selectedTextRect;
+      setSelectedTextRect({ left, right, top, bottom });
     }, 100);
 
     document.addEventListener("scroll", handleScroll);
     return () => document.removeEventListener("scroll", handleScroll);
   }, [showEntryPanel, pinned]);
 
-  // hide entry panel when click outside
+  // hide entry icon or panel when click outside
   useEffect(() => {
     const handleMouseDown = (event: MouseEvent) => {
       // do not hide if click on the extension element
@@ -200,8 +237,9 @@ const Entry = () => {
       if (target.localName === "plasmo-csui") return;
       if (pinned) return;
 
+      setShowEntryIcon(false);
       setShowEntryPanel(false);
-      setSourceTextRect({ left: 0, right: 0, top: 0, bottom: 0 });
+      setSelectedTextRect({ left: 0, right: 0, top: 0, bottom: 0 });
     };
 
     document.addEventListener("mousedown", handleMouseDown);
@@ -210,6 +248,20 @@ const Entry = () => {
 
   return (
     <>
+      <AnimatePresence>
+        {showEntryIcon && (
+          <motion.div
+            className="-translate-x-1/2 base-background base-border base-font fixed transform cursor-pointer rounded-lg p-2 text-sm shadow-md transition-shadow duration-200 hover:shadow-lg"
+            initial={{ opacity: 0, x: entryIconPosition.x, y: entryIconPosition.y + 10 }}
+            whileInView={{ opacity: 1, x: entryIconPosition.x, y: entryIconPosition.y }}
+            exit={{ opacity: 0 }}
+            onClick={handleEntryIconClick}
+          >
+            <Sparkles size={18} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <AnimatePresence>
         {showEntryPanel && (
           <motion.div
@@ -303,7 +355,7 @@ const Entry = () => {
                   <div className="mb-1 flex items-center">
                     {targetWordData && (
                       <motion.span {...baseMotionProps} className="mr-3 font-bold text-lg">
-                        {sourceText}
+                        {selectedText}
                       </motion.span>
                     )}
                     {targetWordData?.pronunciation && (
