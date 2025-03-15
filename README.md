@@ -13,8 +13,8 @@
 
 # ✨ Nova Translate
 
-![Chrome Web Store Version][store-version]
-![GitHub Repo stars][repo-stars]
+![Chrome Web Store Version][store-version-badge]
+![GitHub Repo stars][repo-stars-badge]
 
 Nova Translate is A **fully AI-driven** browser extension.
 
@@ -35,5 +35,8 @@ Nova offers a seamless and elegant user experience, making translation effortles
 
 ## 📃 License
 
-[store-version]: https://img.shields.io/chrome-web-store/v/mohpemfmgnpnikigjeopcnadediiogib?style=for-the-badge&logo=chromewebstore&logoColor=white
-[repo-stars]: https://img.shields.io/github/stars/yhlchao/nova-translate?style=for-the-badge&logo=github&color=38bdf8
+![GitHub License][license-badge]
+
+[store-version-badge]: https://img.shields.io/chrome-web-store/v/mohpemfmgnpnikigjeopcnadediiogib?style=for-the-badge&logo=chromewebstore&logoColor=white
+[repo-stars-badge]: https://img.shields.io/github/stars/yhlchao/nova-translate?style=for-the-badge&logo=github&color=38bdf8
+[license-badge]: https://img.shields.io/github/license/yhlchao/nova-translate?style=for-the-badge
