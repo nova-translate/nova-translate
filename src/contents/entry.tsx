@@ -186,25 +186,27 @@ const Entry = () => {
   // biome-ignore lint/correctness/useExhaustiveDependencies(getTranslatedText): <explanation>
   useEffect(() => {
     const handleMouseUp = (event: MouseEvent) => {
-      const selectedTextInfo = getSelectedTextInfo();
+      setTimeout(() => {
+        const selectedTextInfo = getSelectedTextInfo();
 
-      if (!selectedTextInfo) {
-        setShowEntryIcon(false);
-        return;
-      }
+        if (!selectedTextInfo) {
+          setShowEntryIcon(false);
+          return;
+        }
 
-      setSelectedText(selectedTextInfo.selectedText);
-      setContext(selectedTextInfo.selectedTextContext);
+        setSelectedText(selectedTextInfo.selectedText);
+        setContext(selectedTextInfo.selectedTextContext);
 
-      const target = event.target as HTMLElement;
-      if (showEntryPanel && target.localName !== "plasmo-csui") {
-        getTranslatedText(selectedTextInfo.selectedText, selectedTextInfo.selectedTextContext);
-      }
+        const target = event.target as HTMLElement;
+        if (showEntryPanel && target.localName !== "plasmo-csui") {
+          getTranslatedText(selectedTextInfo.selectedText, selectedTextInfo.selectedTextContext);
+        }
 
-      if (!showEntryPanel) {
-        setShowEntryIcon(true);
-        setSelectedTextRect(selectedTextInfo.selectedTextRect);
-      }
+        if (!showEntryPanel) {
+          setShowEntryIcon(true);
+          setSelectedTextRect(selectedTextInfo.selectedTextRect);
+        }
+      }, 0);
     };
 
     document.addEventListener("mouseup", handleMouseUp);
@@ -251,13 +253,14 @@ const Entry = () => {
       <AnimatePresence>
         {showEntryIcon && (
           <motion.div
-            className="-translate-x-1/2 base-background base-border base-font fixed transform cursor-pointer rounded-lg p-2 text-sm shadow-md transition-shadow duration-200 hover:shadow-lg"
+            className="-translate-x-1/2 base-background base-border base-font fixed transform cursor-pointer rounded-lg p-1.5 text-sm shadow-md transition-background transition-shadow duration-200 hover:bg-gradient-to-tr hover:from-sky-300 hover:to-indigo-300 hover:shadow-lg"
             initial={{ opacity: 0, x: entryIconPosition.x, y: entryIconPosition.y + 10 }}
             whileInView={{ opacity: 1, x: entryIconPosition.x, y: entryIconPosition.y }}
+            whileHover={{ scale: 1.1 }}
             exit={{ opacity: 0 }}
             onClick={handleEntryIconClick}
           >
-            <Sparkles size={18} />
+            <Sparkles size={18} className="fill-white" />
           </motion.div>
         )}
       </AnimatePresence>
