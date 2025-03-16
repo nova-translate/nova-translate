@@ -32,6 +32,12 @@ Nova offers a seamless and elegant user experience, making translation effortles
   <img src="https://static.nova-translate.com/en_to_jp_single_world_mode.jpg" width="400" alt="Single world mode" />
 </div>
 
+## 🍀 Usage
+
+### Chrome Web Store
+
+Under review, will be available very soon. ❤️
+
 ## 🚀 Key Features
 
 - **Dual Translation Modes**: Supports both word and long text translation.
@@ -39,12 +45,6 @@ Nova offers a seamless and elegant user experience, making translation effortles
 - **Custom LLM Service**: Support integration with custom LLM service providers.
 - **Minimalist & Elegant UI**: A clean, refreshing, and fluid interface for a seamless user experience.
 - 🚧 **Continuous Enhancements**: More powerful features are in development — stay tuned!
-
-## Usage
-
-### Chrome Web Store
-
-Under review, will be available soon. ❤️
 
 ## 🗺️ Roadmap
 
@@ -54,6 +54,7 @@ Under review, will be available soon. ❤️
 - [ ] **Vocabulary book**: Save translated words and phrases for future review and reference.
 - [ ] Support more types of AI service API, not just OpenAI compatibility.
 - [ ] Support Ollama local LLM service.
+- [ ] ......
 
 ## 📃 License
 
