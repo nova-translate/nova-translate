@@ -25,7 +25,7 @@ Nova offers a seamless and elegant user experience, making translation effortles
 
 <br />
 
-## Screenshots
+## 📸 Screenshots
 
 <div align="center">
   <img src="https://static.nova-translate.com/en_to_zh_long_text_mode.jpg" width="400" alt="Long text mode" />
@@ -34,11 +34,26 @@ Nova offers a seamless and elegant user experience, making translation effortles
 
 ## 🚀 Key Features
 
-- Dual Translation Modes: Supports both word and long text translation.
-- Context-Aware Translation: Delivers precise translations by considering the surrounding text.
-- Custom LLM Support: Support integration with custom large language model (LLM) service providers.
-- Minimalist & Elegant UI: A clean, refreshing, and fluid interface for a seamless user experience.
-- 🚧 Continuous Enhancements: More powerful features are in development —stay tuned!
+- **Dual Translation Modes**: Supports both word and long text translation.
+- **Context-Aware Translation**: Delivers precise translations by considering the surrounding text.
+- **Custom LLM Service**: Support integration with custom LLM service providers.
+- **Minimalist & Elegant UI**: A clean, refreshing, and fluid interface for a seamless user experience.
+- 🚧 **Continuous Enhancements**: More powerful features are in development — stay tuned!
+
+## Usage
+
+### Chrome Web Store
+
+Under review, will be available soon. ❤️
+
+## 🗺️ Roadmap
+
+- [x] Translate single words or phrases.
+- [x] Translate longer sentences or paragraphs.
+- [x] Support for custom LLM service providers（OpenAI compatible only）.
+- [ ] **Vocabulary book**: Save translated words and phrases for future review and reference.
+- [ ] Support more types of AI service API, not just OpenAI compatibility.
+- [ ] Support Ollama local LLM service.
 
 ## 📃 License
 
