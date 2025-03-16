@@ -25,6 +25,13 @@ Nova offers a seamless and elegant user experience, making translation effortles
 
 <br />
 
+## Screenshots
+
+<div align="center">
+  <img src="https://static.nova-translate.com/en_to_zh_long_text_mode.jpg" width="400" alt="Long text mode" />
+  <img src="https://static.nova-translate.com/en_to_jp_single_world_mode.jpg" width="400" alt="Single world mode" />
+</div>
+
 ## 🚀 Key Features
 
 - Dual Translation Modes: Supports both word and long text translation.
