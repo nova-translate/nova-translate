@@ -62,8 +62,6 @@
   "manifest": {
     "default_locale": "en",
     "permissions": [
-      "activeTab",
-      "scripting",
       "storage"
     ],
     "host_permissions": [
