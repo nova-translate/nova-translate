@@ -10,6 +10,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DEFAULT_SHORTCUT } from "@/config/common";
+import Sentry from "@/lib/sentry";
 
 function IndexPopup() {
   const [apiKey, setApiKey] = useStorage<string>(StorageKeys.API_KEY);
@@ -95,4 +96,4 @@ function IndexPopup() {
   );
 }
 
-export default IndexPopup;
+export default Sentry.withProfiler(IndexPopup);

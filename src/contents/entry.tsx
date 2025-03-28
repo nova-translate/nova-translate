@@ -13,11 +13,11 @@ import { StorageKeys } from "@/config/storage";
 import { MessageTypes } from "@/config/message";
 import { cn } from "@/lib/utils";
 import { DEFAULT_SHORTCUT, LanguageEnum, Languages, MAX_TRANSLATION_LENGTH, TextTypes } from "@/config/common";
-
-import cssText from "data-text:@/styles/contents.css";
 import type { SingleWordInfoType } from "@/background/ports/ai";
 import { baseMotionProps } from "@/config/motion";
 import { Toggle } from "@/components/ui/toggle";
+
+import cssText from "data-text:@/styles/contents.css";
 
 export const getStyle = () => {
   const style = document.createElement("style");
@@ -333,9 +333,7 @@ const Entry = () => {
                 </Toggle>
               </div>
             </div>
-
             <Separator className="my-3 bg-slate-300/70 dark:bg-slate-200/70" />
-
             <div className="relative min-h-8">
               <AnimatePresence>
                 {loading && textType !== TextTypes.LONG_TEXT && (
