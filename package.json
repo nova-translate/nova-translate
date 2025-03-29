@@ -11,6 +11,9 @@
     "test": "plasmo test",
     "prepare": "husky install"
   },
+  "engines": {
+    "node": ">=16.0.0"
+  },
   "dependencies": {
     "@ai-sdk/openai": "1.1.11",
     "@plasmohq/messaging": "0.7.1",
