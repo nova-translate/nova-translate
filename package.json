@@ -10,7 +10,7 @@
   },
   "scripts": {
     "dev": "plasmo dev",
-    "build": "plasmo build",
+    "build": "cross-env PARCEL_WORKER_BACKEND=process plasmo build",
     "test": "plasmo test",
     "prepare": "husky install"
   },
@@ -58,6 +58,7 @@
     "@types/react-dom": "18.2.15",
     "@types/tiny-segmenter": "^0.2.0",
     "autoprefixer": "10.4.16",
+    "cross-env": "^7.0.3",
     "cssnano": "^7.0.6",
     "husky": "8.0.0",
     "lint-staged": "15.2.0",
