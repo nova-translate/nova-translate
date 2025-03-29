@@ -5,6 +5,9 @@
   "description": "A fully AI-driven translate extension that helps you understand foreign languages effortlessly. ",
   "author": "lucas.liuchao@gmail.com",
   "license": "AGPL-3.0-only",
+  "repository": {
+    "url": "https://github.com/nova-translate/nova-translate.git"
+  },
   "scripts": {
     "dev": "plasmo dev",
     "build": "plasmo build",
@@ -62,6 +65,7 @@
     "husky": "8.0.0",
     "lint-staged": "15.2.0",
     "postcss": "8.4.32",
+    "semantic-release": "^24.2.3",
     "tailwindcss": "3.4.17",
     "typescript": "5.2.2"
   },
