@@ -4,6 +4,7 @@
   "version": "0.0.1",
   "description": "A fully AI-driven translate extension that helps you understand foreign languages effortlessly. ",
   "author": "lucas.liuchao@gmail.com",
+  "license": "AGPL-3.0-only",
   "scripts": {
     "dev": "plasmo dev",
     "build": "plasmo build",
