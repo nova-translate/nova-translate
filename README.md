@@ -36,9 +36,7 @@ Nova offers a seamless and elegant user experience, making translation effortles
 
 ### Chrome Web Store
 
-You can install Nova Translate from the Chrome Web Store:
-
-[![Chrome Web Store Version][store-version-badge]](https://chromewebstore.google.com/detail/nova-translate/mohpemfmgnpnikigjeopcnadediiogib)
+You can install Nova Translate from the Chrome Web Store: [Nova Translate](https://chromewebstore.google.com/detail/nova-translate/mohpemfmgnpnikigjeopcnadediiogib)
 
 ## 🚀 Key Features
 
